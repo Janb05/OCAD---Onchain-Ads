@@ -8,7 +8,7 @@
     <!-- Ethers v5 MUST load before sdk.js -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
-    <!-- Updated dAd Space SDK -->
+    <!-- dAd Space SDK -->
     <script src="sdk.js"></script>
 
     <style>
@@ -159,12 +159,12 @@
         {
           inputs: [
             { internalType: "string", name: "_adId", type: "string" },
-            { internalType: "uint256", name: "_spendLimit", type: "uint256" }
+            { internalType: "uint256", name: "_spendLimit", type: "uint256" },
           ],
           name: "settleTransaction",
           outputs: [],
           stateMutability: "nonpayable",
-          type: "function"
+          type: "function",
         },
         {
           inputs: [
@@ -179,13 +179,13 @@
             {
               internalType: "address",
               name: "_publisherId",
-              type: "address"
-            }
+              type: "address",
+            },
           ],
           name: "submitTransaction",
           outputs: [],
           stateMutability: "nonpayable",
-          type: "function"
+          type: "function",
         },
         {
           inputs: [{ internalType: "string", name: "", type: "string" }],
@@ -199,11 +199,11 @@
             { internalType: "string", name: "desc", type: "string" },
             { internalType: "bool", name: "status", type: "bool" },
             { internalType: "string", name: "clickTag", type: "string" },
-            { internalType: "address", name: "publisherId", type: "address" }
+            { internalType: "address", name: "publisherId", type: "address" },
           ],
           stateMutability: "view",
-          type: "function"
-        }
+          type: "function",
+        },
       ];
 
       const logEl = document.getElementById("log");
@@ -222,14 +222,24 @@
         abi: CONTRACT_ABI,
         slotSelector: "#dad-ad-slot",
 
-        personaEndpoint: null,
-        analyticsEndpoint: null,
+        personaEndpoint: null, // falls back to deterministic persona
+        analyticsEndpoint: null, // impressions stored only on-chain for now
 
-        // optional; we rely on localStorage + global fallback now
-        adIdsByPersona: {},
-
-        network: "sepolia"
+        adIdsByPersona: {}, // uses localStorage mapping from publisher
+        network: "sepolia",
       });
+
+      // NEW: react to account / network change in MetaMask
+      if (window.ethereum) {
+        window.ethereum.on("accountsChanged", () => {
+          // easiest & safest: hard reload so SDK + ethers pick new account
+          window.location.reload();
+        });
+
+        window.ethereum.on("chainChanged", () => {
+          window.location.reload();
+        });
+      }
 
       loadAdBtn.addEventListener("click", async () => {
         try {

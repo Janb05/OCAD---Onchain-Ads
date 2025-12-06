@@ -34,11 +34,11 @@
     // This will be filled from localStorage (dadspace_adIds) + overrides from init()
     adIdsByPersona: {},
 
-    personaEndpoint: null,   // e.g. http://localhost:4000/persona
+    personaEndpoint: null, // e.g. http://localhost:4000/persona
     analyticsEndpoint: null, // e.g. http://localhost:4000/events
 
     network: "sepolia",
-    dappId: "sample-dapp"    // used in /events payload
+    dappId: "sample-dapp", // used in /events payload
   };
 
   let _contract = null;
@@ -68,7 +68,8 @@
     });
     if (!Array.isArray(children)) children = [children];
     children.forEach((c) => {
-      if (typeof c === "string") element.appendChild(document.createTextNode(c));
+      if (typeof c === "string")
+        element.appendChild(document.createTextNode(c));
       else if (c) element.appendChild(c);
     });
     return element;
@@ -85,12 +86,15 @@
         if (parsed && typeof parsed === "object") {
           _config.adIdsByPersona = {
             ..._config.adIdsByPersona,
-            ...parsed
+            ...parsed,
           };
         }
       }
     } catch (e) {
-      console.warn("[dAdSpace SDK] Failed to read dadspace_adIds from localStorage:", e);
+      console.warn(
+        "[dAdSpace SDK] Failed to read dadspace_adIds from localStorage:",
+        e
+      );
     }
   }
 
@@ -121,7 +125,9 @@
   // -------------------------
   async function resolvePersona(address) {
     if (!_config.personaEndpoint) {
-      console.warn("[dAdSpace SDK] personaEndpoint not configured. Using fallback 'thrift'.");
+      console.warn(
+        "[dAdSpace SDK] personaEndpoint not configured. Using fallback 'thrift'."
+      );
       _persona = "thrift";
       _personaDetail = {
         address,
@@ -130,14 +136,14 @@
           tx_30d: 0,
           avg_tx_usd: 0,
           nft_trades_90d: 0,
-          stablecoin_ratio: 0.5
+          stablecoin_ratio: 0.5,
         },
         scores: {
           thrift: 1,
           luxe: 0,
           frequent: 0,
-          bulk: 0
-        }
+          bulk: 0,
+        },
       };
       return _persona;
     }
@@ -146,7 +152,7 @@
       const res = await fetch(_config.personaEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address })
+        body: JSON.stringify({ address }),
       });
 
       if (!res.ok) {
@@ -158,7 +164,10 @@
       const persona = data.persona;
 
       if (!persona || !PERSONAS.includes(persona)) {
-        console.warn("[dAdSpace SDK] Invalid persona from backend. Using 'thrift'. Data:", data);
+        console.warn(
+          "[dAdSpace SDK] Invalid persona from backend. Using 'thrift'. Data:",
+          data
+        );
         _persona = "thrift";
       } else {
         _persona = persona;
@@ -166,7 +175,10 @@
       _personaDetail = data;
       return _persona;
     } catch (err) {
-      console.warn("[dAdSpace SDK] Persona backend failed, using 'thrift':", err);
+      console.warn(
+        "[dAdSpace SDK] Persona backend failed, using 'thrift':",
+        err
+      );
       _persona = "thrift";
       _personaDetail = null;
       return _persona;
@@ -214,7 +226,7 @@
       desc: ad.desc,
       status: ad.status,
       clickTag: ad.clickTag,
-      publisherId: ad.publisherId
+      publisherId: ad.publisherId,
     };
   }
 
@@ -226,19 +238,19 @@
 
     try {
       const body = {
-        type: eventType,                        // "impression" | "click"
-        address: _wallet,                       // viewer wallet
-        persona: _persona || "thrift",          // resolved persona
+        type: eventType, // "impression" | "click"
+        address: _wallet, // viewer wallet
+        persona: _persona || "thrift", // resolved persona
         adId: adData.adId,
         publisherId: adData.publisherId,
         dappId: _config.dappId || "sample-dapp",
-        metadata: metadata || {}
+        metadata: metadata || {},
       };
 
       await fetch(_config.analyticsEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
       });
     } catch (e) {
       console.warn("[dAdSpace SDK] Analytics failed", e);
@@ -259,7 +271,11 @@
     clear(container);
     container.style.minHeight = "150px";
     container.appendChild(
-      el("div", { style: { color: "#aaa", padding: "10px", fontSize: "12px" } }, "Loading ad…")
+      el(
+        "div",
+        { style: { color: "#aaa", padding: "10px", fontSize: "12px" } },
+        "Loading ad…"
+      )
     );
 
     try {
@@ -283,8 +299,9 @@
             borderRadius: "14px",
             overflow: "hidden",
             background: "#0d1117",
-            fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-          }
+            fontFamily:
+              "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+          },
         },
         [
           // header
@@ -298,8 +315,8 @@
                 borderBottom: "1px solid #222",
                 display: "flex",
                 justifyContent: "space-between",
-                alignItems: "center"
-              }
+                alignItems: "center",
+              },
             },
             [
               "Sponsored · dAd Space",
@@ -310,11 +327,11 @@
                     background: "#111827",
                     padding: "2px 8px",
                     borderRadius: "999px",
-                    fontSize: "11px"
-                  }
+                    fontSize: "11px",
+                  },
                 },
                 `Persona: ${persona}`
-              )
+              ),
             ]
           ),
 
@@ -326,53 +343,49 @@
                   width: "100%",
                   maxHeight: "260px",
                   objectFit: "cover",
-                  display: "block"
-                }
+                  display: "block",
+                },
               })
             : null,
 
           // body
-          el(
-            "div",
-            { style: { padding: "10px" } },
-            [
-              el(
-                "div",
-                {
-                  style: {
-                    fontSize: "14px",
-                    marginBottom: "6px",
-                    color: "#fff",
-                    lineHeight: 1.3
+          el("div", { style: { padding: "10px" } }, [
+            el(
+              "div",
+              {
+                style: {
+                  fontSize: "14px",
+                  marginBottom: "6px",
+                  color: "#fff",
+                  lineHeight: 1.3,
+                },
+              },
+              ad.desc || ""
+            ),
+            el(
+              "button",
+              {
+                style: {
+                  background: "#ec4899",
+                  color: "white",
+                  padding: "8px 14px",
+                  borderRadius: "999px",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                },
+                onclick: () => {
+                  // click tracking
+                  track("click", ad, { clickTag: ad.clickTag });
+                  if (ad.clickTag) {
+                    window.open(ad.clickTag, "_blank", "noopener,noreferrer");
                   }
                 },
-                ad.desc || ""
-              ),
-              el(
-                "button",
-                {
-                  style: {
-                    background: "#ec4899",
-                    color: "white",
-                    padding: "8px 14px",
-                    borderRadius: "999px",
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: "12px",
-                    fontWeight: 600
-                  },
-                  onclick: () => {
-                    // click tracking
-                    track("click", ad, { clickTag: ad.clickTag });
-                    if (ad.clickTag) {
-                      window.open(ad.clickTag, "_blank", "noopener,noreferrer");
-                    }
-                  }
-                },
-                ad.cta || "Visit"
-              )
-            ]
-          )
+              },
+              ad.cta || "Visit"
+            ),
+          ]),
         ]
       );
 
@@ -380,7 +393,6 @@
 
       // 5) Send impression automatically
       track("impression", ad, { imageSize: ad.imageSize });
-
     } catch (err) {
       console.error("[dAdSpace SDK] renderSlot error:", err);
       clear(container);
@@ -418,7 +430,9 @@
       Object.assign(_config, config || {});
 
       if (!_config.contractAddress || !_config.abi) {
-        console.warn("[dAdSpace SDK] contractAddress or abi missing in init().");
+        console.warn(
+          "[dAdSpace SDK] contractAddress or abi missing in init()."
+        );
       }
 
       // load persona → adIds mapping from localStorage
@@ -438,8 +452,8 @@
         wallet: _wallet,
         persona: _persona,
         personaDetail: _personaDetail,
-        config: _config
+        config: _config,
       };
-    }
+    },
   };
 })(window);

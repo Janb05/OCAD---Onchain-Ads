@@ -1,555 +1,685 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>dAd Space – Publisher</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <head>
+    <meta charset="UTF-8" />
+    <title>OCAD – Publisher</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Ethers v5 -->
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <!-- Ethers v5 -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      background: #050509;
-      color: #f9fafb;
-    }
-    .app { display: flex; min-height: 100vh; }
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: #050509;
+        color: #f9fafb;
+      }
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
 
-    /* Sidebar */
-    .sidebar {
-      width: 240px;
-      padding: 20px;
-      border-right: 1px solid #171823;
-      background: #050509;
-    }
-    .logo {
-      font-size: 20px;
-      font-weight: 700;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .logo div:first-child {
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      background: #ff3366;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: 800;
-    }
-    .nav { display: flex; flex-direction: column; gap: 4px; }
-    .nav-button {
-      border: none;
-      background: transparent;
-      color: #cbd5f5;
-      padding: 8px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      text-align: left;
-      font-size: 14px;
-    }
-    .nav-button.active { background: #ff3366; color: white; }
+      /* Sidebar */
+      .sidebar {
+        width: 240px;
+        padding: 20px;
+        border-right: 1px solid #171823;
+        background: #050509;
+      }
+      .logo {
+        font-size: 20px;
+        font-weight: 700;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .logo div:first-child {
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        background: #ff3366;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 800;
+      }
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .nav-button {
+        border: none;
+        background: transparent;
+        color: #cbd5f5;
+        padding: 8px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: left;
+        font-size: 14px;
+      }
+      .nav-button.active {
+        background: #ff3366;
+        color: white;
+      }
 
-    /* Main */
-    .main {
-      flex: 1;
-      padding: 24px 32px;
-      background: radial-gradient(circle at top left, #18181b, #020617 55%);
-    }
-    .top-bar {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .wallet-label {
-      font-size: 13px;
-      color: #a5b4fc;
-    }
-    .btn {
-      padding: 8px 14px;
-      border: none;
-      border-radius: 999px;
-      cursor: pointer;
-      background: #4f46e5;
-      color: white;
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .view { display: none; }
-    .view.active { display: block; }
+      /* Main */
+      .main {
+        flex: 1;
+        padding: 24px 32px;
+        background: radial-gradient(circle at top left, #18181b, #020617 55%);
+      }
+      .top-bar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      .wallet-label {
+        font-size: 13px;
+        color: #a5b4fc;
+      }
+      .btn {
+        padding: 8px 14px;
+        border: none;
+        border-radius: 999px;
+        cursor: pointer;
+        background: #4f46e5;
+        color: white;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .view {
+        display: none;
+      }
+      .view.active {
+        display: block;
+      }
 
-    /* New Ad layout */
-    .header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .header-row h2 {
-      margin: 0;
-      font-size: 22px;
-    }
-    .upload-box {
-      border: 2px dashed #4b5563;
-      padding: 26px;
-      text-align: center;
-      border-radius: 16px;
-      cursor: pointer;
-      background: rgba(15,23,42,0.7);
-      margin-bottom: 18px;
-    }
-    .upload-box:hover {
-      border-color: #ff3366;
-      background: rgba(15,23,42,0.9);
-    }
-    .hidden { display: none; }
+      /* New Ad layout */
+      .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .header-row h2 {
+        margin: 0;
+        font-size: 22px;
+      }
+      .upload-box {
+        border: 2px dashed #4b5563;
+        padding: 26px;
+        text-align: center;
+        border-radius: 16px;
+        cursor: pointer;
+        background: rgba(15, 23, 42, 0.7);
+        margin-bottom: 18px;
+      }
+      .upload-box:hover {
+        border-color: #ff3366;
+        background: rgba(15, 23, 42, 0.9);
+      }
+      .hidden {
+        display: none;
+      }
 
-    .editor-row {
-      display: grid;
-      grid-template-columns: 260px minmax(0,1fr);
-      gap: 32px;
-      align-items: flex-start;
-    }
+      .editor-row {
+        display: grid;
+        grid-template-columns: 260px minmax(0, 1fr);
+        gap: 32px;
+        align-items: flex-start;
+      }
 
-    /* Preview */
-    .ad-preview-inner {
-      width: 240px;
-      border-radius: 18px;
-      overflow: hidden;
-      background: white;
-      color: black;
-      box-shadow: 0 18px 40px rgba(0,0,0,0.45);
-    }
-    .ad-preview-inner img {
-      width: 100%;
-      max-height: 200px;
-      object-fit: cover;
-      display: block;
-      background: #e5e7eb;
-    }
-    .ad-preview-title {
-      font-size: 14px;
-      font-weight: 600;
-      padding: 8px 10px 4px;
-    }
-    .ad-preview-desc {
-      font-size: 12px;
-      padding: 0 10px 8px;
-      color: #4b5563;
-    }
-    .ad-preview-cta {
-      background: #ec4899;
-      color: white;
-      padding: 6px 10px;
-      border-radius: 999px;
-      margin: 0 10px 10px;
-      display: inline-block;
-      font-size: 12px;
-    }
+      /* Preview */
+      .ad-preview-inner {
+        width: 240px;
+        border-radius: 18px;
+        overflow: hidden;
+        background: white;
+        color: black;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+      }
+      .ad-preview-inner img {
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+        display: block;
+        background: #e5e7eb;
+      }
+      .ad-preview-title {
+        font-size: 14px;
+        font-weight: 600;
+        padding: 8px 10px 4px;
+      }
+      .ad-preview-desc {
+        font-size: 12px;
+        padding: 0 10px 8px;
+        color: #4b5563;
+      }
+      .ad-preview-cta {
+        background: #ec4899;
+        color: white;
+        padding: 6px 10px;
+        border-radius: 999px;
+        margin: 0 10px 10px;
+        display: inline-block;
+        font-size: 12px;
+      }
 
-    /* Form */
-    form label {
-      display: block;
-      margin-bottom: 10px;
-      font-size: 13px;
-    }
-    input, textarea, select {
-      width: 100%;
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 1px solid #334155;
-      background: #020617;
-      color: white;
-      font-size: 13px;
-    }
-    textarea { resize: vertical; min-height: 70px; }
+      /* Form */
+      form label {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 13px;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 10px;
+        border: 1px solid #334155;
+        background: #020617;
+        color: white;
+        font-size: 13px;
+      }
+      textarea {
+        resize: vertical;
+        min-height: 70px;
+      }
 
-    .persona-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 4px;
-    }
-    .persona-chip {
-      border: 1px solid #4b5563;
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
+      .persona-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 4px;
+      }
+      .persona-chip {
+        border: 1px solid #4b5563;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
 
-    .status {
-      margin-top: 8px;
-      font-size: 13px;
-    }
-    .status.success { color: #6ee7b7; }
-    .status.error   { color: #fca5a5; }
+      .status {
+        margin-top: 8px;
+        font-size: 13px;
+      }
+      .status.success {
+        color: #6ee7b7;
+      }
+      .status.error {
+        color: #fca5a5;
+      }
 
-    /* Past ads */
-    #pastAdsList {
-      margin-top: 16px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-    }
-    .past-card {
-      background: #111827;
-      border-radius: 14px;
-      border: 1px solid #1f2937;
-      padding: 10px;
-      font-size: 12px;
-    }
-    .past-card img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-bottom: 8px;
-    }
-    .past-title {
-      font-weight: 600;
-      font-size: 13px;
-    }
-    .past-meta {
-      margin-top: 2px;
-      color: #9ca3af;
-    }
-    .pill {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid #4b5563;
-      font-size: 11px;
-      margin-right: 4px;
-    }
+      /* Past ads */
+      #pastAdsList {
+        margin-top: 16px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+      .past-card {
+        background: #111827;
+        border-radius: 14px;
+        border: 1px solid #1f2937;
+        padding: 10px;
+        font-size: 12px;
+      }
+      .past-card img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 8px;
+      }
+      .past-title {
+        font-weight: 600;
+        font-size: 13px;
+      }
+      .past-meta {
+        margin-top: 2px;
+        color: #9ca3af;
+      }
+      .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        border: 1px solid #4b5563;
+        font-size: 11px;
+        margin-right: 4px;
+      }
 
-    /* Dashboard */
-    .dash-grid {
-      margin-top: 16px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-    }
-    .dash-card {
-      background: #111827;
-      border-radius: 16px;
-      border: 1px solid #1f2937;
-      padding: 14px;
-      font-size: 13px;
-    }
-    .dash-label {
-      font-size: 11px;
-      color: #a5b4fc;
-      margin-bottom: 2px;
-    }
-    .dash-value {
-      font-size: 26px;
-      font-weight: 600;
-    }
-    .dash-sub {
-      font-size: 11px;
-      color: #9ca3af;
-      margin-top: 2px;
-    }
+      /* Dashboard */
+      .dash-grid {
+        margin-top: 16px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+      }
+      .dash-card {
+        background: #111827;
+        border-radius: 16px;
+        border: 1px solid #1f2937;
+        padding: 14px;
+        font-size: 13px;
+      }
+      .dash-label {
+        font-size: 11px;
+        color: #a5b4fc;
+        margin-bottom: 2px;
+      }
+      .dash-value {
+        font-size: 26px;
+        font-weight: 600;
+      }
+      .dash-sub {
+        font-size: 11px;
+        color: #9ca3af;
+        margin-top: 2px;
+      }
 
-    .chart-grid {
-      margin-top: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 18px;
-    }
-    .chart-card {
-      background: #111827;
-      border-radius: 16px;
-      border: 1px solid #1f2937;
-      padding: 12px 14px;
-      font-size: 12px;
-    }
-    .chart-title {
-      font-size: 13px;
-      margin-bottom: 6px;
-    }
-    .chart-placeholder {
-      margin-top: 4px;
-      height: 160px;
-      border-radius: 10px;
-      background: radial-gradient(circle at top, #1f2937, #020617);
-      position: relative;
-      overflow: hidden;
-    }
-    .chart-placeholder::before {
-      content: "";
-      position: absolute;
-      inset: 12px 10px 10px 32px;
-      border-left: 1px solid #374151;
-      border-bottom: 1px solid #374151;
-    }
-    .chart-line {
-      position: absolute;
-      inset: 16px 16px 18px 40px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #4f46e5, #ec4899);
-      opacity: 0.7;
-      transform-origin: left bottom;
-      transform: scaleY(0.35);
-    }
+      .chart-grid {
+        margin-top: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 18px;
+      }
+      .chart-card {
+        background: #111827;
+        border-radius: 16px;
+        border: 1px solid #1f2937;
+        padding: 12px 14px;
+        font-size: 12px;
+      }
+      .chart-title {
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      .chart-placeholder {
+        margin-top: 4px;
+        height: 160px;
+        border-radius: 10px;
+        background: radial-gradient(circle at top, #1f2937, #020617);
+        position: relative;
+        overflow: hidden;
+      }
+      .chart-placeholder::before {
+        content: "";
+        position: absolute;
+        inset: 12px 10px 10px 32px;
+        border-left: 1px solid #374151;
+        border-bottom: 1px solid #374151;
+      }
+      .chart-line {
+        position: absolute;
+        inset: 16px 16px 18px 40px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #4f46e5, #ec4899);
+        opacity: 0.7;
+        transform-origin: left bottom;
+        transform: scaleY(0.35);
+      }
 
-    /* Notifications */
-    #notifList {
-      margin-top: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .notif-card {
-      background: #111827;
-      border-radius: 14px;
-      border: 1px solid #1f2937;
-      padding: 10px 12px;
-      font-size: 12px;
-    }
-    .notif-title {
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .notif-meta {
-      color: #9ca3af;
-      font-size: 11px;
-    }
-  </style>
-</head>
+      /* Notifications */
+      #notifList {
+        margin-top: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .notif-card {
+        background: #111827;
+        border-radius: 14px;
+        border: 1px solid #1f2937;
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+      .notif-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .notif-meta {
+        color: #9ca3af;
+        font-size: 11px;
+      }
+    </style>
+  </head>
 
-<body>
-  <div class="app">
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">
+          <div>d</div>
+          OCAD- OnChain Ads
+        </div>
+        <div class="nav">
+          <button class="nav-button active" data-view="new-ad">New Ad</button>
+          <button class="nav-button" data-view="past-ads">Past Ads</button>
+          <button class="nav-button" data-view="dashboard">Dashboard</button>
+          <button class="nav-button" data-view="notifications">
+            Notifications
+          </button>
+        </div>
+      </aside>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="logo"><div>d</div>dAd Space</div>
-      <div class="nav">
-        <button class="nav-button active" data-view="new-ad">New Ad</button>
-        <button class="nav-button" data-view="past-ads">Past Ads</button>
-        <button class="nav-button" data-view="dashboard">Dashboard</button>
-        <button class="nav-button" data-view="notifications">Notifications</button>
-      </div>
-    </aside>
-
-    <!-- Main -->
-    <main class="main">
-      <div class="top-bar">
-        <span id="walletLabel" class="wallet-label"></span>
-        <button id="connectBtn" class="btn">Connect Wallet</button>
-      </div>
-
-      <!-- NEW AD VIEW -->
-      <section id="view-new-ad" class="view active">
-        <div class="header-row">
-          <h2>Create New Ad</h2>
-          <button id="startNewAdBtn" class="btn">Start New Ad</button>
+      <!-- Main -->
+      <main class="main">
+        <div class="top-bar">
+          <span id="walletLabel" class="wallet-label"></span>
+          <button id="connectBtn" class="btn">Connect Wallet</button>
         </div>
 
-        <div id="uploadStep" class="upload-box">
-          Click or drag file here to upload
-          <input id="fileInput" type="file" accept="image/*" class="hidden" />
-        </div>
+        <!-- NEW AD VIEW -->
+        <section id="view-new-ad" class="view active">
+          <div class="header-row">
+            <h2>Create New Ad</h2>
+            <button id="startNewAdBtn" class="btn">Start New Ad</button>
+          </div>
 
-        <div id="editorStep" class="editor-row hidden">
-          <div>
-            <div class="ad-preview-inner">
-              <img id="previewImage" src="" alt="Ad preview" />
-              <div class="ad-preview-title" id="previewTitle">CTA text</div>
-              <div class="ad-preview-desc" id="previewDesc">CTA description</div>
-              <div class="ad-preview-cta" id="previewButton">Apply now</div>
+          <div id="uploadStep" class="upload-box">
+            Click or drag file here to upload
+            <input id="fileInput" type="file" accept="image/*" class="hidden" />
+          </div>
+
+          <div id="editorStep" class="editor-row hidden">
+            <div>
+              <div class="ad-preview-inner">
+                <img id="previewImage" src="" alt="Ad preview" />
+                <div class="ad-preview-title" id="previewTitle">CTA text</div>
+                <div class="ad-preview-desc" id="previewDesc">
+                  CTA description
+                </div>
+                <div class="ad-preview-cta" id="previewButton">Apply now</div>
+              </div>
+            </div>
+
+            <div>
+              <form id="settingsForm" onsubmit="return false;">
+                <label
+                  >CTA Text
+                  <input
+                    id="ctaText"
+                    type="text"
+                    placeholder="Launch your dApp in minutes"
+                  />
+                </label>
+                <label
+                  >Description
+                  <textarea
+                    id="ctaDesc"
+                    placeholder="Short description of the offer"
+                  ></textarea>
+                </label>
+                <label
+                  >ClickTag (Landing URL)
+                  <input
+                    id="clickTag"
+                    type="text"
+                    placeholder="https://your-site.com"
+                  />
+                </label>
+                <label
+                  >Spend Limit (ETH)
+                  <input id="spendLimit" type="number" min="0" step="0.0001" />
+                </label>
+                <label
+                  >Image Size
+                  <select id="imageSize">
+                    <option value="vertical">vertical</option>
+                    <option value="horizontal">horizontal</option>
+                  </select>
+                </label>
+
+                <label>Select Persona(s)</label>
+                <div class="persona-group">
+                  <label class="persona-chip"
+                    ><input
+                      type="checkbox"
+                      class="personaCheckbox"
+                      value="thrift"
+                    />
+                    thrift</label
+                  >
+                  <label class="persona-chip"
+                    ><input
+                      type="checkbox"
+                      class="personaCheckbox"
+                      value="luxe"
+                    />
+                    luxe</label
+                  >
+                  <label class="persona-chip"
+                    ><input
+                      type="checkbox"
+                      class="personaCheckbox"
+                      value="frequent"
+                    />
+                    frequent</label
+                  >
+                  <label class="persona-chip"
+                    ><input
+                      type="checkbox"
+                      class="personaCheckbox"
+                      value="bulk"
+                    />
+                    bulk</label
+                  >
+                </div>
+              </form>
+
+              <button id="publishBtn" class="btn" disabled>Publish</button>
+              <div id="status" class="status"></div>
+              <div id="txLink"></div>
+              <div
+                id="adIdLabel"
+                style="margin-top: 6px; font-size: 12px; color: #9ca3af"
+              ></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PAST ADS VIEW -->
+        <section id="view-past-ads" class="view">
+          <h2>Past Ads</h2>
+          <div id="pastAdsList"></div>
+        </section>
+
+        <!-- DASHBOARD VIEW -->
+        <section id="view-dashboard" class="view">
+          <h2>Analytics</h2>
+
+          <div class="dash-grid">
+            <div class="dash-card">
+              <div class="dash-label">Sum · CTR</div>
+              <div class="dash-value" id="metricCTR">0.00</div>
+              <div class="dash-sub">Click-through rate across all ads</div>
+            </div>
+            <div class="dash-card">
+              <div class="dash-label">Sum · Clicks</div>
+              <div class="dash-value" id="metricClicks">0</div>
+              <div class="dash-sub">Total clicks tracked</div>
+            </div>
+            <div class="dash-card">
+              <div class="dash-label">Sum · Impressions</div>
+              <div class="dash-value" id="metricImpressions">0</div>
+              <div class="dash-sub">Total impressions served</div>
+            </div>
+            <div class="dash-card">
+              <div class="dash-label">Published Ads (on-chain)</div>
+              <div class="dash-value" id="metricAds">0</div>
+              <div class="dash-sub">Number of ads indexed by The Graph</div>
             </div>
           </div>
 
-          <div>
-            <form id="settingsForm" onsubmit="return false;">
-              <label>CTA Text
-                <input id="ctaText" type="text" placeholder="Launch your dApp in minutes" />
-              </label>
-              <label>Description
-                <textarea id="ctaDesc" placeholder="Short description of the offer"></textarea>
-              </label>
-              <label>ClickTag (Landing URL)
-                <input id="clickTag" type="text" placeholder="https://your-site.com" />
-              </label>
-              <label>Spend Limit (ETH)
-                <input id="spendLimit" type="number" min="0" step="0.0001" />
-              </label>
-              <label>Image Size
-                <select id="imageSize">
-                  <option value="vertical">vertical</option>
-                  <option value="horizontal">horizontal</option>
-                </select>
-              </label>
-
-              <label>Select Persona(s)</label>
-              <div class="persona-group">
-                <label class="persona-chip"><input type="checkbox" class="personaCheckbox" value="thrift" /> thrift</label>
-                <label class="persona-chip"><input type="checkbox" class="personaCheckbox" value="luxe" /> luxe</label>
-                <label class="persona-chip"><input type="checkbox" class="personaCheckbox" value="frequent" /> frequent</label>
-                <label class="persona-chip"><input type="checkbox" class="personaCheckbox" value="bulk" /> bulk</label>
+          <div class="chart-grid">
+            <div class="chart-card">
+              <div class="chart-title">Variation of CTR (sample)</div>
+              <div class="chart-placeholder">
+                <div class="chart-line"></div>
               </div>
-            </form>
-
-            <button id="publishBtn" class="btn" disabled>Publish</button>
-            <div id="status" class="status"></div>
-            <div id="txLink"></div>
-            <div id="adIdLabel" style="margin-top:6px;font-size:12px;color:#9ca3af;"></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Clicks over time (sample)</div>
+              <div class="chart-placeholder">
+                <div class="chart-line" style="transform: scaleY(0.6)"></div>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Impressions over time (sample)</div>
+              <div class="chart-placeholder">
+                <div class="chart-line" style="transform: scaleY(0.9)"></div>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- PAST ADS VIEW -->
-      <section id="view-past-ads" class="view">
-        <h2>Past Ads</h2>
-        <div id="pastAdsList"></div>
-      </section>
+        <!-- NOTIFICATIONS VIEW -->
+        <section id="view-notifications" class="view">
+          <h2>Notifications</h2>
+          <p style="font-size: 12px; color: #9ca3af; margin-top: 4px">
+            These are sample entries. Wire this to Push / your backend feed when
+            ready.
+          </p>
+          <div id="notifList"></div>
+        </section>
+      </main>
+    </div>
 
-      <!-- DASHBOARD VIEW -->
-      <section id="view-dashboard" class="view">
-        <h2>Analytics</h2>
+    <script>
+      // ---------------- CONFIG ----------------
+      const CONTRACT_ADDRESS = "0xCc1A2753885ac4c814d74A80F73c4db549d1C7b2";
 
-        <div class="dash-grid">
-          <div class="dash-card">
-            <div class="dash-label">Sum · CTR</div>
-            <div class="dash-value" id="metricCTR">0.00</div>
-            <div class="dash-sub">Click-through rate across all ads</div>
-          </div>
-          <div class="dash-card">
-            <div class="dash-label">Sum · Clicks</div>
-            <div class="dash-value" id="metricClicks">0</div>
-            <div class="dash-sub">Total clicks tracked</div>
-          </div>
-          <div class="dash-card">
-            <div class="dash-label">Sum · Impressions</div>
-            <div class="dash-value" id="metricImpressions">0</div>
-            <div class="dash-sub">Total impressions served</div>
-          </div>
-          <div class="dash-card">
-            <div class="dash-label">Published Ads (on-chain)</div>
-            <div class="dash-value" id="metricAds">0</div>
-            <div class="dash-sub">Number of ads indexed by The Graph</div>
-          </div>
-        </div>
+      const CONTRACT_ABI = [
+        {
+          inputs: [
+            { internalType: "string", name: "_adId", type: "string" },
+            { internalType: "uint256", name: "_spendLimit", type: "uint256" },
+          ],
+          name: "settleTransaction",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "string", name: "_adId", type: "string" },
+            { internalType: "uint256", name: "_spendLimit", type: "uint256" },
+            { internalType: "string", name: "_imageUrl", type: "string" },
+            { internalType: "string", name: "_imageSize", type: "string" },
+            { internalType: "string", name: "_cta", type: "string" },
+            { internalType: "string", name: "_desc", type: "string" },
+            { internalType: "string[]", name: "_personid", type: "string[]" },
+            { internalType: "string", name: "_clickTag", type: "string" },
+            { internalType: "address", name: "_publisherId", type: "address" },
+          ],
+          name: "submitTransaction",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [{ internalType: "string", name: "", type: "string" }],
+          name: "transactions",
+          outputs: [
+            { internalType: "string", name: "adId", type: "string" },
+            { internalType: "uint256", name: "spendLimit", type: "uint256" },
+            { internalType: "string", name: "imageUrl", type: "string" },
+            { internalType: "string", name: "imageSize", type: "string" },
+            { internalType: "string", name: "cta", type: "string" },
+            { internalType: "string", name: "desc", type: "string" },
+            { internalType: "bool", name: "status", type: "bool" },
+            { internalType: "string", name: "clickTag", type: "string" },
+            { internalType: "address", name: "publisherId", type: "address" },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+      ];
 
-        <div class="chart-grid">
-          <div class="chart-card">
-            <div class="chart-title">Variation of CTR (sample)</div>
-            <div class="chart-placeholder"><div class="chart-line"></div></div>
-          </div>
-          <div class="chart-card">
-            <div class="chart-title">Clicks over time (sample)</div>
-            <div class="chart-placeholder"><div class="chart-line" style="transform:scaleY(0.6);"></div></div>
-          </div>
-          <div class="chart-card">
-            <div class="chart-title">Impressions over time (sample)</div>
-            <div class="chart-placeholder"><div class="chart-line" style="transform:scaleY(0.9);"></div></div>
-          </div>
-        </div>
-      </section>
+      // The Graph subgraph URL
+      const SUBGRAPH_URL =
+        "https://api.studio.thegraph.com/query/1718236/d-adspace/version/latest";
 
-      <!-- NOTIFICATIONS VIEW -->
-      <section id="view-notifications" class="view">
-        <h2>Notifications</h2>
-        <p style="font-size:12px;color:#9ca3af;margin-top:4px;">
-          These are sample entries. Wire this to Push / your backend feed when ready.
-        </p>
-        <div id="notifList"></div>
-      </section>
-    </main>
-  </div>
+      let currentAccount = null;
+      let contract = null;
 
-  <script>
-    // ---------------- CONFIG ----------------
-    const CONTRACT_ADDRESS = "0xCc1A2753885ac4c814d74A80F73c4db549d1C7b2";
+      const connectBtn = document.getElementById("connectBtn");
+      const walletLabel = document.getElementById("walletLabel");
 
-    const CONTRACT_ABI = [
-      {
-        "inputs":[
-          {"internalType":"string","name":"_adId","type":"string"},
-          {"internalType":"uint256","name":"_spendLimit","type":"uint256"}
-        ],
-        "name":"settleTransaction","outputs":[],"stateMutability":"nonpayable","type":"function"
-      },
-      {
-        "inputs":[
-          {"internalType":"string","name":"_adId","type":"string"},
-          {"internalType":"uint256","name":"_spendLimit","type":"uint256"},
-          {"internalType":"string","name":"_imageUrl","type":"string"},
-          {"internalType":"string","name":"_imageSize","type":"string"},
-          {"internalType":"string","name":"_cta","type":"string"},
-          {"internalType":"string","name":"_desc","type":"string"},
-          {"internalType":"string[]","name":"_personid","type":"string[]"},
-          {"internalType":"string","name":"_clickTag","type":"string"},
-          {"internalType":"address","name":"_publisherId","type":"address"}
-        ],
-        "name":"submitTransaction","outputs":[],"stateMutability":"nonpayable","type":"function"
-      },
-      {
-        "inputs":[{"internalType":"string","name":"","type":"string"}],
-        "name":"transactions",
-        "outputs":[
-          {"internalType":"string","name":"adId","type":"string"},
-          {"internalType":"uint256","name":"spendLimit","type":"uint256"},
-          {"internalType":"string","name":"imageUrl","type":"string"},
-          {"internalType":"string","name":"imageSize","type":"string"},
-          {"internalType":"string","name":"cta","type":"string"},
-          {"internalType":"string","name":"desc","type":"string"},
-          {"internalType":"bool","name":"status","type":"bool"},
-          {"internalType":"string","name":"clickTag","type":"string"},
-          {"internalType":"address","name":"publisherId","type":"address"}
-        ],
-        "stateMutability":"view","type":"function"
+      connectBtn.addEventListener("click", connectWallet);
+
+      // >>> NEW: react to MetaMask account / network changes
+      if (window.ethereum) {
+        window.ethereum.on("accountsChanged", async (accounts) => {
+          if (!accounts || accounts.length === 0) {
+            currentAccount = null;
+            contract = null;
+            walletLabel.textContent = "";
+            return;
+          }
+
+          currentAccount = accounts[0];
+
+          walletLabel.textContent =
+            "Connected: " +
+            currentAccount.slice(0, 6) +
+            "..." +
+            currentAccount.slice(-4);
+
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const signer = provider.getSigner();
+          contract = new ethers.Contract(
+            CONTRACT_ADDRESS,
+            CONTRACT_ABI,
+            signer
+          );
+
+          console.log("[OCAD] accountsChanged → now using", currentAccount);
+        });
+
+        window.ethereum.on("chainChanged", () => {
+          // ensures we re-init provider/contract on network change
+          window.location.reload();
+        });
       }
-    ];
+      // <<< END NEW
 
-    // The Graph subgraph URL
-    const SUBGRAPH_URL =
-      "https://api.studio.thegraph.com/query/1718236/d-adspace/version/latest";
+      async function connectWallet() {
+        if (!window.ethereum) {
+          alert("MetaMask not found");
+          return;
+        }
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const accounts = await provider.send("eth_requestAccounts", []);
+        currentAccount = accounts[0];
 
-    let currentAccount = null;
-    let contract = null;
+        walletLabel.textContent =
+          "Connected: " +
+          currentAccount.slice(0, 6) +
+          "..." +
+          currentAccount.slice(-4);
 
-    const connectBtn   = document.getElementById("connectBtn");
-    const walletLabel  = document.getElementById("walletLabel");
-
-    connectBtn.addEventListener("click", connectWallet);
-
-    async function connectWallet() {
-      if (!window.ethereum) {
-        alert("MetaMask not found");
-        return;
+        const signer = provider.getSigner();
+        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
       }
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const accounts = await provider.send("eth_requestAccounts", []);
-      currentAccount = accounts[0];
 
-      walletLabel.textContent =
-        "Connected: " +
-        currentAccount.slice(0, 6) +
-        "..." +
-        currentAccount.slice(-4);
+      // ------------- Subgraph helper -------------
+      async function fetchAdsFromSubgraph(publisherAddress) {
+        if (!publisherAddress) return [];
 
-      const signer = provider.getSigner();
-      contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-    }
-
-    // ------------- Subgraph helper -------------
-    async function fetchAdsFromSubgraph(publisherAddress) {
-      if (!publisherAddress) return [];
-
-      const query = `
+        const query = `
         query AdsByPublisher($publisher: Bytes!) {
           ads(where: { publisher: $publisher }) {
             id
@@ -565,338 +695,353 @@
         }
       `;
 
-      const res = await fetch(SUBGRAPH_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          query,
-          variables: { publisher: publisherAddress.toLowerCase() }
-        })
-      });
-
-      const json = await res.json();
-      if (json.errors) {
-        console.error("Subgraph error:", json.errors);
-        throw new Error("Subgraph query failed");
-      }
-
-      return json.data.ads;
-    }
-
-    // ------------- Navigation -------------
-    const navButtons = document.querySelectorAll(".nav-button");
-    const views = {
-      "new-ad": document.getElementById("view-new-ad"),
-      "past-ads": document.getElementById("view-past-ads"),
-      "dashboard": document.getElementById("view-dashboard"),
-      "notifications": document.getElementById("view-notifications"),
-    };
-
-    navButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        navButtons.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        Object.values(views).forEach(v => v.classList.remove("active"));
-        views[btn.dataset.view].classList.add("active");
-
-        if (btn.dataset.view === "past-ads") renderPastAds();
-        if (btn.dataset.view === "dashboard") renderDashboard();
-        if (btn.dataset.view === "notifications") renderNotifications();
-      });
-    });
-
-    // ------------- New Ad form / preview -------------
-    const startNewAdBtn = document.getElementById("startNewAdBtn");
-    const uploadStep    = document.getElementById("uploadStep");
-    const fileInput     = document.getElementById("fileInput");
-    const editorStep    = document.getElementById("editorStep");
-
-    const previewImage  = document.getElementById("previewImage");
-    const previewTitle  = document.getElementById("previewTitle");
-    const previewDesc   = document.getElementById("previewDesc");
-    const previewButton = document.getElementById("previewButton");
-
-    const ctaTextInput   = document.getElementById("ctaText");
-    const ctaDescInput   = document.getElementById("ctaDesc");
-    const clickTagInput  = document.getElementById("clickTag");
-    const spendLimitInput= document.getElementById("spendLimit");
-    const imageSizeInput = document.getElementById("imageSize");
-    const personaCheckboxes = document.querySelectorAll(".personaCheckbox");
-
-    const publishBtn = document.getElementById("publishBtn");
-    const adIdLabel  = document.getElementById("adIdLabel");
-    const statusEl   = document.getElementById("status");
-    const txLinkEl   = document.getElementById("txLink");
-
-    let selectedImageUrl = null;
-    let currentAdId      = null;
-
-    function resetNewAdForm() {
-      uploadStep.classList.remove("hidden");
-      editorStep.classList.add("hidden");
-
-      fileInput.value = "";
-      selectedImageUrl = null;
-      currentAdId = null;
-      previewImage.src = "";
-      previewTitle.textContent  = "CTA text";
-      previewDesc.textContent   = "CTA description";
-      previewButton.textContent = "Apply now";
-      ctaTextInput.value   = "";
-      ctaDescInput.value   = "";
-      clickTagInput.value  = "";
-      spendLimitInput.value= "";
-      imageSizeInput.value = "vertical";
-      personaCheckboxes.forEach(cb => cb.checked = false);
-      adIdLabel.textContent = "";
-      statusEl.textContent  = "";
-      statusEl.className    = "status";
-      txLinkEl.innerHTML    = "";
-      publishBtn.disabled   = true;
-    }
-
-    startNewAdBtn.addEventListener("click", resetNewAdForm);
-
-    uploadStep.addEventListener("click", () => fileInput.click());
-
-    fileInput.addEventListener("change", e => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      selectedImageUrl = URL.createObjectURL(file);
-      previewImage.src = selectedImageUrl;
-
-      currentAdId = "ad-" + Date.now();
-      adIdLabel.textContent = "Generated Ad ID: " + currentAdId;
-
-      uploadStep.classList.add("hidden");
-      editorStep.classList.remove("hidden");
-      publishBtn.disabled = false;
-    });
-
-    ctaTextInput.addEventListener("input", () => {
-      const v = ctaTextInput.value || "CTA text";
-      previewTitle.textContent  = v;
-      previewButton.textContent = v || "Apply now";
-    });
-
-    ctaDescInput.addEventListener("input", () => {
-      previewDesc.textContent = ctaDescInput.value || "CTA description";
-    });
-
-    // ------------- Publish Ad -------------
-    publishBtn.addEventListener("click", async () => {
-      if (!contract || !currentAccount) {
-        alert("Connect wallet first.");
-        return;
-      }
-      if (!selectedImageUrl || !currentAdId) {
-        alert("Upload an image first.");
-        return;
-      }
-
-      const personas = [];
-      personaCheckboxes.forEach(cb => cb.checked && personas.push(cb.value));
-      if (personas.length === 0) {
-        alert("Select at least one persona.");
-        return;
-      }
-
-      const spendEth = spendLimitInput.value || "0";
-      const spendWei = ethers.utils.parseEther(spendEth);
-
-      try {
-        publishBtn.disabled = true;
-        statusEl.textContent = "Submitting transaction...";
-        statusEl.className = "status";
-
-        const tx = await contract.submitTransaction(
-          currentAdId,
-          spendWei,
-          selectedImageUrl,
-          imageSizeInput.value,
-          ctaTextInput.value || "CTA",
-          ctaDescInput.value || "Description",
-          personas,
-          clickTagInput.value || "",
-          currentAccount
-        );
-
-        const receipt = await tx.wait();
-
-        statusEl.textContent = "Success! Ad submitted to Sepolia.";
-        statusEl.classList.add("success");
-        txLinkEl.innerHTML =
-          `<a href="https://sepolia.etherscan.io/tx/${receipt.transactionHash}" target="_blank" style="color:#a5b4fc;">View on Etherscan</a>`;
-
-        saveAdIdForPersonas(personas, currentAdId);
-        savePastAd({
-          adId: currentAdId,
-          imageUrl: selectedImageUrl,
-          personas,
-          spend: spendEth,
-          desc: ctaDescInput.value || "Description"
+        const res = await fetch(SUBGRAPH_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query,
+            variables: { publisher: publisherAddress.toLowerCase() },
+          }),
         });
 
-      } catch (err) {
-        console.error(err);
-        statusEl.textContent = "Error: " + (err.data?.message || err.message || err);
-        statusEl.classList.add("error");
-      } finally {
-        publishBtn.disabled = false;
+        const json = await res.json();
+        if (json.errors) {
+          console.error("Subgraph error:", json.errors);
+          throw new Error("Subgraph query failed");
+        }
+
+        return json.data.ads;
       }
-    });
 
-    function saveAdIdForPersonas(personas, adId) {
-      const key = "dadspace_adIds";
-      const raw = localStorage.getItem(key);
-      const map = raw ? JSON.parse(raw) : {};
+      // ------------- Navigation -------------
+      const navButtons = document.querySelectorAll(".nav-button");
+      const views = {
+        "new-ad": document.getElementById("view-new-ad"),
+        "past-ads": document.getElementById("view-past-ads"),
+        dashboard: document.getElementById("view-dashboard"),
+        notifications: document.getElementById("view-notifications"),
+      };
 
-      personas.forEach(p => {
-        if (!map[p]) map[p] = [];
-        if (!map[p].includes(adId)) map[p].push(adId);
+      navButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          navButtons.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          Object.values(views).forEach((v) => v.classList.remove("active"));
+          views[btn.dataset.view].classList.add("active");
+
+          if (btn.dataset.view === "past-ads") renderPastAds();
+          if (btn.dataset.view === "dashboard") renderDashboard();
+          if (btn.dataset.view === "notifications") renderNotifications();
+        });
       });
 
-      localStorage.setItem(key, JSON.stringify(map));
-      console.log("[dAdSpace] Saved adId to localStorage:", adId, "for personas:", personas);
-    }
+      // ------------- New Ad form / preview -------------
+      const startNewAdBtn = document.getElementById("startNewAdBtn");
+      const uploadStep = document.getElementById("uploadStep");
+      const fileInput = document.getElementById("fileInput");
+      const editorStep = document.getElementById("editorStep");
 
-    function savePastAd(ad) {
-      const key = "dadspace_publishedAds";
-      const list = JSON.parse(localStorage.getItem(key) || "[]");
-      list.push(ad);
-      localStorage.setItem(key, JSON.stringify(list));
-    }
+      const previewImage = document.getElementById("previewImage");
+      const previewTitle = document.getElementById("previewTitle");
+      const previewDesc = document.getElementById("previewDesc");
+      const previewButton = document.getElementById("previewButton");
 
-    // ------------- Past Ads rendering (from subgraph) -------------
-    async function renderPastAds() {
-      const container = document.getElementById("pastAdsList");
-      container.innerHTML = "";
+      const ctaTextInput = document.getElementById("ctaText");
+      const ctaDescInput = document.getElementById("ctaDesc");
+      const clickTagInput = document.getElementById("clickTag");
+      const spendLimitInput = document.getElementById("spendLimit");
+      const imageSizeInput = document.getElementById("imageSize");
+      const personaCheckboxes = document.querySelectorAll(".personaCheckbox");
 
-      try {
-        const onchainAds = currentAccount
-          ? await fetchAdsFromSubgraph(currentAccount)
-          : [];
+      const publishBtn = document.getElementById("publishBtn");
+      const adIdLabel = document.getElementById("adIdLabel");
+      const statusEl = document.getElementById("status");
+      const txLinkEl = document.getElementById("txLink");
 
-        if (onchainAds.length === 0) {
-          container.innerHTML =
-            "<p style='color:#9ca3af;font-size:13px;'>No ads published on-chain yet.</p>";
+      let selectedImageUrl = null;
+      let currentAdId = null;
+
+      function resetNewAdForm() {
+        uploadStep.classList.remove("hidden");
+        editorStep.classList.add("hidden");
+
+        fileInput.value = "";
+        selectedImageUrl = null;
+        currentAdId = null;
+        previewImage.src = "";
+        previewTitle.textContent = "CTA text";
+        previewDesc.textContent = "CTA description";
+        previewButton.textContent = "Apply now";
+        ctaTextInput.value = "";
+        ctaDescInput.value = "";
+        clickTagInput.value = "";
+        spendLimitInput.value = "";
+        imageSizeInput.value = "vertical";
+        personaCheckboxes.forEach((cb) => (cb.checked = false));
+        adIdLabel.textContent = "";
+        statusEl.textContent = "";
+        statusEl.className = "status";
+        txLinkEl.innerHTML = "";
+        publishBtn.disabled = true;
+      }
+
+      startNewAdBtn.addEventListener("click", resetNewAdForm);
+
+      uploadStep.addEventListener("click", () => fileInput.click());
+
+      fileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        selectedImageUrl = URL.createObjectURL(file);
+        previewImage.src = selectedImageUrl;
+
+        currentAdId = "ad-" + Date.now();
+        adIdLabel.textContent = "Generated Ad ID: " + currentAdId;
+
+        uploadStep.classList.add("hidden");
+        editorStep.classList.remove("hidden");
+        publishBtn.disabled = false;
+      });
+
+      ctaTextInput.addEventListener("input", () => {
+        const v = ctaTextInput.value || "CTA text";
+        previewTitle.textContent = v;
+        previewButton.textContent = v || "Apply now";
+      });
+
+      ctaDescInput.addEventListener("input", () => {
+        previewDesc.textContent = ctaDescInput.value || "CTA description";
+      });
+
+      // ------------- Publish Ad -------------
+      publishBtn.addEventListener("click", async () => {
+        if (!contract || !currentAccount) {
+          alert("Connect wallet first.");
+          return;
+        }
+        if (!selectedImageUrl || !currentAdId) {
+          alert("Upload an image first.");
           return;
         }
 
-        onchainAds
-          .slice()
-          .sort((a, b) => Number(b.createdAt) - Number(a.createdAt))
-          .forEach(ad => {
-            const card = document.createElement("div");
-            card.className = "past-card";
+        const personas = [];
+        personaCheckboxes.forEach(
+          (cb) => cb.checked && personas.push(cb.value)
+        );
+        if (personas.length === 0) {
+          alert("Select at least one persona.");
+          return;
+        }
 
-            const imgHtml = ad.imageUrl
-              ? `<img src="${ad.imageUrl}" alt="Ad image" />`
-              : "";
+        const spendEth = spendLimitInput.value || "0";
+        const spendWei = ethers.utils.parseEther(spendEth);
 
-            card.innerHTML = `
+        try {
+          publishBtn.disabled = true;
+          statusEl.textContent = "Submitting transaction...";
+          statusEl.className = "status";
+
+          const tx = await contract.submitTransaction(
+            currentAdId,
+            spendWei,
+            selectedImageUrl,
+            imageSizeInput.value,
+            ctaTextInput.value || "CTA",
+            ctaDescInput.value || "Description",
+            personas,
+            clickTagInput.value || "",
+            currentAccount
+          );
+
+          const receipt = await tx.wait();
+
+          statusEl.textContent = "Success! Ad submitted to Sepolia.";
+          statusEl.classList.add("success");
+          txLinkEl.innerHTML = `<a href="https://sepolia.etherscan.io/tx/${receipt.transactionHash}" target="_blank" style="color:#a5b4fc;">View on Etherscan</a>`;
+
+          saveAdIdForPersonas(personas, currentAdId);
+          savePastAd({
+            adId: currentAdId,
+            imageUrl: selectedImageUrl,
+            personas,
+            spend: spendEth,
+            desc: ctaDescInput.value || "Description",
+          });
+        } catch (err) {
+          console.error(err);
+          statusEl.textContent =
+            "Error: " + (err.data?.message || err.message || err);
+          statusEl.classList.add("error");
+        } finally {
+          publishBtn.disabled = false;
+        }
+      });
+
+      function saveAdIdForPersonas(personas, adId) {
+        const key = "dadspace_adIds";
+        const raw = localStorage.getItem(key);
+        const map = raw ? JSON.parse(raw) : {};
+
+        personas.forEach((p) => {
+          if (!map[p]) map[p] = [];
+          if (!map[p].includes(adId)) map[p].push(adId);
+        });
+
+        localStorage.setItem(key, JSON.stringify(map));
+        console.log(
+          "[dAdSpace] Saved adId to localStorage:",
+          adId,
+          "for personas:",
+          personas
+        );
+      }
+
+      function savePastAd(ad) {
+        const key = "dadspace_publishedAds";
+        const list = JSON.parse(localStorage.getItem(key) || "[]");
+        list.push(ad);
+        localStorage.setItem(key, JSON.stringify(list));
+      }
+
+      // ------------- Past Ads rendering (from subgraph) -------------
+      async function renderPastAds() {
+        const container = document.getElementById("pastAdsList");
+        container.innerHTML = "";
+
+        try {
+          const onchainAds = currentAccount
+            ? await fetchAdsFromSubgraph(currentAccount)
+            : [];
+
+          if (onchainAds.length === 0) {
+            container.innerHTML =
+              "<p style='color:#9ca3af;font-size:13px;'>No ads published on-chain yet.</p>";
+            return;
+          }
+
+          onchainAds
+            .slice()
+            .sort((a, b) => Number(b.createdAt) - Number(a.createdAt))
+            .forEach((ad) => {
+              const card = document.createElement("div");
+              card.className = "past-card";
+
+              const imgHtml = ad.imageUrl
+                ? `<img src="${ad.imageUrl}" alt="Ad image" />`
+                : "";
+
+              card.innerHTML = `
               ${imgHtml}
               <div class="past-title">${ad.adId}</div>
               <div class="past-meta">SpendLimit (wei): ${ad.spendLimit}</div>
-              <div class="past-meta">Status: ${ad.status ? "active" : "settled"}</div>
+              <div class="past-meta">Status: ${
+                ad.status ? "active" : "settled"
+              }</div>
               <div class="past-meta">
-                ${ad.personids.map(p => `<span class="pill">${p}</span>`).join("")}
+                ${ad.personids
+                  .map((p) => `<span class="pill">${p}</span>`)
+                  .join("")}
               </div>
-              <div class="past-meta" style="margin-top:4px;">${ad.desc || ""}</div>
+              <div class="past-meta" style="margin-top:4px;">${
+                ad.desc || ""
+              }</div>
             `;
-            container.appendChild(card);
-          });
-      } catch (e) {
-        console.error("PastAds subgraph fetch failed", e);
-        container.innerHTML =
-          "<p style='color:#fca5a5;font-size:13px;'>Failed to load ads from subgraph.</p>";
-      }
-    }
-
-    // ------------- Dashboard rendering -------------
-    async function renderDashboard() {
-      const localAds = JSON.parse(
-        localStorage.getItem("dadspace_publishedAds") || "[]"
-      );
-      const publishedLocal = localAds.length;
-
-      try {
-        const onchainAds = currentAccount
-          ? await fetchAdsFromSubgraph(currentAccount)
-          : [];
-
-        const adsPublished = onchainAds.length || publishedLocal;
-
-        let totalSpendWei = 0n;
-        onchainAds.forEach(ad => {
-          totalSpendWei += BigInt(ad.spendLimit);
-        });
-        const totalSpendEth = Number(
-          ethers.utils.formatEther(totalSpendWei.toString())
-        );
-
-        // Analytics backend not wired yet → keep 0 for now
-        const totalImpressions = 0;
-        const totalClicks = 0;
-        const ctr = 0;
-
-        document.getElementById("metricCTR").textContent = ctr.toFixed(2);
-        document.getElementById("metricClicks").textContent =
-          totalClicks.toString();
-        document.getElementById("metricImpressions").textContent =
-          totalImpressions.toString();
-        document.getElementById("metricAds").textContent =
-          adsPublished.toString();
-
-        console.log("[dAdSpace] totalSpendEth (from subgraph):", totalSpendEth);
-      } catch (e) {
-        console.error("Dashboard subgraph fetch failed", e);
-        document.getElementById("metricCTR").textContent = "0.00";
-        document.getElementById("metricClicks").textContent = "0";
-        document.getElementById("metricImpressions").textContent = "0";
-        document.getElementById("metricAds").textContent =
-          publishedLocal.toString();
-      }
-    }
-
-    // ------------- Notifications (mock) -------------
-    function renderNotifications() {
-      const container = document.getElementById("notifList");
-      container.innerHTML = "";
-
-      const sample = [
-        {
-          title: "Campaign ETH India – CTR spike",
-          body: "CTR reached 0.12 in the last 1h. Consider increasing budget.",
-          time: "2 min ago"
-        },
-        {
-          title: "NFT Sale Ad – Budget near cap",
-          body: "You have spent 85% of the allotted budget.",
-          time: "1 hr ago"
-        },
-        {
-          title: "New impressions recorded",
-          body: "Your campaigns served 430 impressions today.",
-          time: "Today"
+              container.appendChild(card);
+            });
+        } catch (e) {
+          console.error("PastAds subgraph fetch failed", e);
+          container.innerHTML =
+            "<p style='color:#fca5a5;font-size:13px;'>Failed to load ads from subgraph.</p>";
         }
-      ];
+      }
 
-      sample.forEach(n => {
-        const card = document.createElement("div");
-        card.className = "notif-card";
-        card.innerHTML = `
+      // ------------- Dashboard rendering -------------
+      async function renderDashboard() {
+        const localAds = JSON.parse(
+          localStorage.getItem("dadspace_publishedAds") || "[]"
+        );
+        const publishedLocal = localAds.length;
+
+        try {
+          const onchainAds = currentAccount
+            ? await fetchAdsFromSubgraph(currentAccount)
+            : [];
+
+          const adsPublished = onchainAds.length || publishedLocal;
+
+          let totalSpendWei = 0n;
+          onchainAds.forEach((ad) => {
+            totalSpendWei += BigInt(ad.spendLimit);
+          });
+          const totalSpendEth = Number(
+            ethers.utils.formatEther(totalSpendWei.toString())
+          );
+
+          // Analytics backend not wired yet → keep 0 for now
+          const totalImpressions = 0;
+          const totalClicks = 0;
+          const ctr = 0;
+
+          document.getElementById("metricCTR").textContent = ctr.toFixed(2);
+          document.getElementById("metricClicks").textContent =
+            totalClicks.toString();
+          document.getElementById("metricImpressions").textContent =
+            totalImpressions.toString();
+          document.getElementById("metricAds").textContent =
+            adsPublished.toString();
+
+          console.log(
+            "[dAdSpace] totalSpendEth (from subgraph):",
+            totalSpendEth
+          );
+        } catch (e) {
+          console.error("Dashboard subgraph fetch failed", e);
+          document.getElementById("metricCTR").textContent = "0.00";
+          document.getElementById("metricClicks").textContent = "0";
+          document.getElementById("metricImpressions").textContent = "0";
+          document.getElementById("metricAds").textContent =
+            publishedLocal.toString();
+        }
+      }
+
+      // ------------- Notifications (mock) -------------
+      function renderNotifications() {
+        const container = document.getElementById("notifList");
+        container.innerHTML = "";
+
+        const sample = [
+          {
+            title: "Campaign ETH India – CTR spike",
+            body: "CTR reached 0.12 in the last 1h. Consider increasing budget.",
+            time: "2 min ago",
+          },
+          {
+            title: "NFT Sale Ad – Budget near cap",
+            body: "You have spent 85% of the allotted budget.",
+            time: "1 hr ago",
+          },
+          {
+            title: "New impressions recorded",
+            body: "Your campaigns served 430 impressions today.",
+            time: "Today",
+          },
+        ];
+
+        sample.forEach((n) => {
+          const card = document.createElement("div");
+          card.className = "notif-card";
+          card.innerHTML = `
           <div class="notif-title">${n.title}</div>
           <div>${n.body}</div>
           <div class="notif-meta">${n.time}</div>
         `;
-        container.appendChild(card);
-      });
-    }
+          container.appendChild(card);
+        });
+      }
 
-    // initial state
-    resetNewAdForm();
-  </script>
-</body>
+      // initial state
+      resetNewAdForm();
+    </script>
+  </body>
 </html>
