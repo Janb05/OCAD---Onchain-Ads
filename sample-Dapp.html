@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SAMPLE SITE + dAdSpace Ad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Ethers v5 MUST load before sdk.js -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
+    <!-- Updated dAd Space SDK -->
+    <script src="sdk.js"></script>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: #050509;
+        color: #f9fafb;
+      }
+      .page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .content-wrap {
+        max-width: 960px;
+        width: 100%;
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+        gap: 32px;
+        align-items: center;
+      }
+      .center-text {
+        text-align: center;
+        font-size: 48px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+      .sub-text {
+        margin-top: 8px;
+        font-size: 13px;
+        color: #9ca3af;
+        text-align: center;
+      }
+      .ad-card {
+        background: #111827;
+        border-radius: 18px;
+        padding: 16px 18px;
+        border: 1px solid #1f2937;
+      }
+      .ad-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .ad-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+      }
+      .ad-title {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .btn {
+        padding: 7px 14px;
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+        background: #4f46e5;
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      #dad-ad-slot {
+        margin-top: 10px;
+        min-height: 150px;
+      }
+      .wallet-pill {
+        margin-top: 10px;
+        font-size: 11px;
+        color: #9ca3af;
+      }
+      .log-box {
+        margin-top: 10px;
+        background: #020617;
+        border-radius: 10px;
+        padding: 8px;
+        border: 1px solid #1f2937;
+        font-size: 11px;
+        max-height: 100px;
+        overflow: auto;
+        white-space: pre-wrap;
+        color: #9ca3af;
+      }
+
+      @media (max-width: 768px) {
+        .content-wrap {
+          grid-template-columns: 1fr;
+        }
+        .center-text {
+          font-size: 36px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="page">
+      <div class="content-wrap">
+        <!-- LEFT: just SAMPLE SITE -->
+        <div>
+          <div class="center-text">SAMPLE SITE</div>
+          <div class="sub-text">
+            Minimal demo page. The important part is the ad on the right,
+            powered by your on-chain dAd Space contract.
+          </div>
+        </div>
+
+        <!-- RIGHT: dAdSpace ad slot -->
+        <aside class="ad-card">
+          <div class="ad-header">
+            <div>
+              <div class="ad-label">Sponsored</div>
+              <div class="ad-title">dAdSpace Ad</div>
+            </div>
+            <button id="loadAdBtn" class="btn">Connect & Load Ad</button>
+          </div>
+
+          <!-- SDK will render the ad here -->
+          <div id="dad-ad-slot">
+            <div style="font-size: 12px; color: #9ca3af">
+              Click "Connect & Load Ad" to see a persona-based creative.
+            </div>
+          </div>
+
+          <div id="walletLabel" class="wallet-pill">Wallet: —</div>
+          <div id="personaLabel" class="wallet-pill">Persona: —</div>
+
+          <div id="log" class="log-box"></div>
+        </aside>
+      </div>
+    </div>
+
+    <script>
+      // Same Transaction ABI + address as publisher (index.html)
+      const CONTRACT_ADDRESS = "0xCc1A2753885ac4c814d74A80F73c4db549d1C7b2";
+
+      const CONTRACT_ABI = [
+        {
+          inputs: [
+            { internalType: "string", name: "_adId", type: "string" },
+            { internalType: "uint256", name: "_spendLimit", type: "uint256" }
+          ],
+          name: "settleTransaction",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function"
+        },
+        {
+          inputs: [
+            { internalType: "string", name: "_adId", type: "string" },
+            { internalType: "uint256", name: "_spendLimit", type: "uint256" },
+            { internalType: "string", name: "_imageUrl", type: "string" },
+            { internalType: "string", name: "_imageSize", type: "string" },
+            { internalType: "string", name: "_cta", type: "string" },
+            { internalType: "string", name: "_desc", type: "string" },
+            { internalType: "string[]", name: "_personid", type: "string[]" },
+            { internalType: "string", name: "_clickTag", type: "string" },
+            {
+              internalType: "address",
+              name: "_publisherId",
+              type: "address"
+            }
+          ],
+          name: "submitTransaction",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function"
+        },
+        {
+          inputs: [{ internalType: "string", name: "", type: "string" }],
+          name: "transactions",
+          outputs: [
+            { internalType: "string", name: "adId", type: "string" },
+            { internalType: "uint256", name: "spendLimit", type: "uint256" },
+            { internalType: "string", name: "imageUrl", type: "string" },
+            { internalType: "string", name: "imageSize", type: "string" },
+            { internalType: "string", name: "cta", type: "string" },
+            { internalType: "string", name: "desc", type: "string" },
+            { internalType: "bool", name: "status", type: "bool" },
+            { internalType: "string", name: "clickTag", type: "string" },
+            { internalType: "address", name: "publisherId", type: "address" }
+          ],
+          stateMutability: "view",
+          type: "function"
+        }
+      ];
+
+      const logEl = document.getElementById("log");
+      const walletLabel = document.getElementById("walletLabel");
+      const personaLabel = document.getElementById("personaLabel");
+      const loadAdBtn = document.getElementById("loadAdBtn");
+
+      function logLine(msg) {
+        logEl.textContent += msg + "\n";
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      // Init SDK
+      DadSpace.init({
+        contractAddress: CONTRACT_ADDRESS,
+        abi: CONTRACT_ABI,
+        slotSelector: "#dad-ad-slot",
+
+        personaEndpoint: null,
+        analyticsEndpoint: null,
+
+        // optional; we rely on localStorage + global fallback now
+        adIdsByPersona: {},
+
+        network: "sepolia"
+      });
+
+      loadAdBtn.addEventListener("click", async () => {
+        try {
+          logLine("Connecting wallet & loading ad…");
+          await DadSpace.renderSlot("#dad-ad-slot");
+
+          const state = DadSpace.getState();
+
+          if (state.wallet) {
+            walletLabel.textContent =
+              "Wallet: " +
+              state.wallet.slice(0, 6) +
+              "..." +
+              state.wallet.slice(-4);
+          } else {
+            walletLabel.textContent = "Wallet: (connected, no address?)";
+          }
+
+          if (state.persona) {
+            personaLabel.textContent = "Persona: " + state.persona;
+          } else {
+            personaLabel.textContent = "Persona: fallback (thrift)";
+          }
+
+          logLine("Ad rendered successfully.");
+        } catch (err) {
+          console.error(err);
+          logLine("Error: " + (err.message || err));
+          const slot = document.querySelector("#dad-ad-slot");
+          if (slot) {
+            slot.innerHTML =
+              '<div style="color:#fca5a5;font-size:12px;">Ad failed: ' +
+              (err.message || err) +
+              "</div>";
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

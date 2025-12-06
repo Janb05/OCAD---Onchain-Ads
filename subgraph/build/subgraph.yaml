@@ -1,0 +1,26 @@
+specVersion: 0.0.5
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Transaction
+    network: sepolia
+    source:
+      address: "0xCc1A2753885ac4c814d74A80F73c4db549d1C7b2"
+      abi: Transaction
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Ad
+      abis:
+        - name: Transaction
+          file: Transaction/abis/Transaction.json
+      eventHandlers:
+        - event: SubmitTransaction(string,uint256,string,string,string,string,bool,string[],string,address)
+          handler: handleSubmitTransaction
+        - event: SettleTransaction(string,bool)
+          handler: handleSettleTransaction
+      file: Transaction/Transaction.wasm
