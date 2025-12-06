@@ -1,0 +1,16 @@
+type Ad @entity {
+  id: ID!                 # same as adId
+  adId: String!
+  spendLimit: BigInt!
+  imageUrl: String!
+  imageSize: String!
+  cta: String!
+  desc: String!
+  status: Boolean!
+  personids: [String!]!   # array of persona tags
+  clickTag: String!
+  publisher: Bytes!
+
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}

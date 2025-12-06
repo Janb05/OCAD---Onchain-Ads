@@ -1,0 +1,16 @@
+{
+    "name": "dad-space-subgraph",
+    "version": "1.0.0",
+    "scripts": {
+      "codegen": "graph codegen subgraph.yaml",
+      "build": "graph build subgraph.yaml"
+    },
+    "dependencies": {
+      "@graphprotocol/graph-ts": "0.30.0"
+    },
+    "devDependencies": {
+      "@graphprotocol/graph-cli": "0.56.0",
+      "typescript": "^5.0.0"
+    }
+  }
+  
