@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.jpeg" width="500"/>
+  <img src="assets/logo.jpeg" width="500" height="500"/>
 </p>
 
 # Overview
@@ -78,7 +78,7 @@ Revenue Split (Advertiser → Publisher)
 
 Demo video: https://youtu.be/_dGfkDchhls
 Network: Sepolia Testnet (MetaMask)
-<img src="assets/firstpic.jpeg" width="500"/>
-<img src="assets/secondpic.jpeg" width="500"/>
-<img src="assets/thirdpic.jpeg" width="500"/>
-<img src="assets/forpic.jpeg" width="500"/>
+![Architecture Diagram](assets/firstpic.jpeg)
+![Architecture Diagram](assets/secondpic.jpeg)
+![Architecture Diagram](assets/forpic.jpeg)
+![Architecture Diagram](assets/thirdpic.jpeg)
