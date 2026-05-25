@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 app.get("/health", (_req, res) => {
-  res.json({ ok: true, service: "dad-space-web2", time: new Date().toISOString() });
+  res.json({ ok: true, service: "dad-space-web2", time: new Date().toISOString(), uptime: process.uptime() });
 });
 
 app.use("/persona", personaRouter);
@@ -33,6 +33,23 @@ app.use((_req, res) => {
   res.status(404).json({ error: "not_found" });
 });
 
-app.listen(PORT, () => {
-  console.log(`dAd Space web2 backend running on http://localhost:${PORT}`);
+const server = app.listen(PORT, () => {
+  console.log(`[System] dAd Space web2 backend running on http://localhost:${PORT}`);
+});
+
+// Added: Graceful shutdown pipeline for enterprise readiness
+process.on("SIGTERM", () => {
+  console.log("[System] SIGTERM received. Shutting down gracefully...");
+  server.close(() => {
+    console.log("[System] Process terminated.");
+    process.exit(0);
+  });
+});
+
+process.on("SIGINT", () => {
+  console.log("[System] SIGINT received. Shutting down gracefully...");
+  server.close(() => {
+    console.log("[System] Process terminated.");
+    process.exit(0);
+  });
 });
