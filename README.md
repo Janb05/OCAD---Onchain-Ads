@@ -42,6 +42,7 @@ OCAD (Onchain Ads) is a decentralized ad layer for Web3:
   - Spend and performance are transparent
 
 - On-chain analytics foundation
+
   - Views / clicks designed to be tracked via smart contracts + subgraph
   - Easy to extend into dashboards later
 
@@ -77,7 +78,8 @@ Events Logged (views / clicks) → On-chain + subgraph
 Revenue Split (Advertiser → Publisher)
 
 Demo video: https://youtu.be/_dGfkDchhls
-Network: Sepolia Testnet (MetaMask)
+
+Network: Sepolia Testnet (MetaMask)          
 ![Architecture Diagram](assets/firstpic.jpeg)
 ![Architecture Diagram](assets/secondpic.jpeg)
 ![Architecture Diagram](assets/forpic.jpeg)
