@@ -5,10 +5,8 @@
     <title>SAMPLE SITE + dAdSpace Ad</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Ethers v5 MUST load before sdk.js -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
-    <!-- dAd Space SDK -->
     <script src="sdk.js"></script>
 
     <style>
@@ -37,6 +35,15 @@
         gap: 32px;
         align-items: center;
       }
+      
+      /* Semantic Flex Engine Viewport Containment */
+      .content-viewport-flex {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+      }
+      
       .center-text {
         text-align: center;
         font-size: 48px;
@@ -117,36 +124,37 @@
   <body>
     <div class="page">
       <div class="content-wrap">
-        <!-- LEFT: just SAMPLE SITE -->
         <div>
-          <div class="center-text">SAMPLE SITE</div>
-          <div class="sub-text">
-            Minimal demo page. The important part is the ad on the right,
-            powered by your on-chain dAd Space contract.
+          <div class="content-viewport-flex">
+            <div class="center-text">SAMPLE SITE</div>
+            <div class="sub-text">
+              Minimal demo page. The important part is the ad on the right,
+              powered by your on-chain dAd Space contract.
+            </div>
           </div>
         </div>
 
-        <!-- RIGHT: dAdSpace ad slot -->
         <aside class="ad-card">
-          <div class="ad-header">
-            <div>
-              <div class="ad-label">Sponsored</div>
-              <div class="ad-title">dAdSpace Ad</div>
+          <div class="content-viewport-flex">
+            <div class="ad-header">
+              <div>
+                <div class="ad-label">Sponsored</div>
+                <div class="ad-title">dAdSpace Ad</div>
+              </div>
+              <button id="loadAdBtn" class="btn">Connect & Load Ad</button>
             </div>
-            <button id="loadAdBtn" class="btn">Connect & Load Ad</button>
-          </div>
 
-          <!-- SDK will render the ad here -->
-          <div id="dad-ad-slot">
-            <div style="font-size: 12px; color: #9ca3af">
-              Click "Connect & Load Ad" to see a persona-based creative.
+            <div id="dad-ad-slot">
+              <div style="font-size: 12px; color: #9ca3af">
+                Click "Connect & Load Ad" to see a persona-based creative.
+              </div>
             </div>
+
+            <div id="walletLabel" class="wallet-pill">Wallet: —</div>
+            <div id="personaLabel" class="wallet-pill">Persona: —</div>
+
+            <div id="log" class="log-box"></div>
           </div>
-
-          <div id="walletLabel" class="wallet-pill">Wallet: —</div>
-          <div id="personaLabel" class="wallet-pill">Persona: —</div>
-
-          <div id="log" class="log-box"></div>
         </aside>
       </div>
     </div>
