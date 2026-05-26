@@ -6,7 +6,7 @@ import {
   PersonaScores
 } from "../types";
 
-const PERSONAS: Persona[] = ["thrift", "luxe", "frequent", "bulk"];
+const PERSONAS: readonly Persona[] = ["thrift", "luxe", "frequent", "bulk"];
 
 const DUNE_API_KEY = process.env.DUNE_API_KEY;
 const DUNE_QUERY_ID = process.env.DUNE_QUERY_ID;
