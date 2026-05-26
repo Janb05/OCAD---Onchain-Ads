@@ -70,7 +70,8 @@ router.post("/", (req: Request, res: Response) => {
 
     events.push(evt);
     saveEvents();
-
+    console.info(`[Telemetry] Successfully ingested ${type} event for Ad ID: ${evt.adId} (UUID: ${evt.id})`);
+    
     return res.json({ ok: true, id: evt.id });
   } catch (err: any) {
     console.error("[events] post error", err);
