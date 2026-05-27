@@ -5,7 +5,6 @@
     <title>OCAD – Publisher</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Ethers v5 -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
     <style>
@@ -68,7 +67,7 @@
         color: white;
       }
 
-      /* Main */
+      /* Main Dynamic Workspaces */
       .main {
         flex: 1;
         padding: 24px 32px;
@@ -100,6 +99,14 @@
       }
       .view.active {
         display: block;
+      }
+
+      /* Core Section Container Scaffolding */
+      .section-view-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: auto;
       }
 
       /* New Ad layout */
@@ -137,7 +144,7 @@
         align-items: flex-start;
       }
 
-      /* Preview */
+      /* Preview Layout Controls */
       .ad-preview-inner {
         width: 240px;
         border-radius: 18px;
@@ -173,7 +180,7 @@
         font-size: 12px;
       }
 
-      /* Form */
+      /* Form inputs and interactive interfaces */
       form label {
         display: block;
         margin-bottom: 10px;
@@ -222,7 +229,7 @@
         color: #fca5a5;
       }
 
-      /* Past ads */
+      /* Past ads container grid */
       #pastAdsList {
         margin-top: 16px;
         display: grid;
@@ -260,7 +267,7 @@
         margin-right: 4px;
       }
 
-      /* Dashboard */
+      /* Analytics Dashboard Module Grid */
       .dash-grid {
         margin-top: 16px;
         display: grid;
@@ -331,7 +338,7 @@
         transform: scaleY(0.35);
       }
 
-      /* Notifications */
+      /* Notification Matrix Systems */
       #notifList {
         margin-top: 18px;
         display: flex;
@@ -358,7 +365,6 @@
 
   <body>
     <div class="app">
-      <!-- Sidebar -->
       <aside class="sidebar">
         <div class="logo">
           <div>d</div>
@@ -374,185 +380,188 @@
         </div>
       </aside>
 
-      <!-- Main -->
       <main class="main">
         <div class="top-bar">
           <span id="walletLabel" class="wallet-label"></span>
           <button id="connectBtn" class="btn">Connect Wallet</button>
         </div>
 
-        <!-- NEW AD VIEW -->
         <section id="view-new-ad" class="view active">
-          <div class="header-row">
-            <h2>Create New Ad</h2>
-            <button id="startNewAdBtn" class="btn">Start New Ad</button>
-          </div>
-
-          <div id="uploadStep" class="upload-box">
-            Click or drag file here to upload
-            <input id="fileInput" type="file" accept="image/*" class="hidden" />
-          </div>
-
-          <div id="editorStep" class="editor-row hidden">
-            <div>
-              <div class="ad-preview-inner">
-                <img id="previewImage" src="" alt="Ad preview" />
-                <div class="ad-preview-title" id="previewTitle">CTA text</div>
-                <div class="ad-preview-desc" id="previewDesc">
-                  CTA description
-                </div>
-                <div class="ad-preview-cta" id="previewButton">Apply now</div>
-              </div>
+          <div class="section-view-wrapper">
+            <div class="header-row">
+              <h2>Create New Ad</h2>
+              <button id="startNewAdBtn" class="btn">Start New Ad</button>
             </div>
 
-            <div>
-              <form id="settingsForm" onsubmit="return false;">
-                <label
-                  >CTA Text
-                  <input
-                    id="ctaText"
-                    type="text"
-                    placeholder="Launch your dApp in minutes"
-                  />
-                </label>
-                <label
-                  >Description
-                  <textarea
-                    id="ctaDesc"
-                    placeholder="Short description of the offer"
-                  ></textarea>
-                </label>
-                <label
-                  >ClickTag (Landing URL)
-                  <input
-                    id="clickTag"
-                    type="text"
-                    placeholder="https://your-site.com"
-                  />
-                </label>
-                <label
-                  >Spend Limit (ETH)
-                  <input id="spendLimit" type="number" min="0" step="0.0001" />
-                </label>
-                <label
-                  >Image Size
-                  <select id="imageSize">
-                    <option value="vertical">vertical</option>
-                    <option value="horizontal">horizontal</option>
-                  </select>
-                </label>
+            <div id="uploadStep" class="upload-box">
+              Click or drag file here to upload
+              <input id="fileInput" type="file" accept="image/*" class="hidden" />
+            </div>
 
-                <label>Select Persona(s)</label>
-                <div class="persona-group">
-                  <label class="persona-chip"
-                    ><input
-                      type="checkbox"
-                      class="personaCheckbox"
-                      value="thrift"
-                    />
-                    thrift</label
-                  >
-                  <label class="persona-chip"
-                    ><input
-                      type="checkbox"
-                      class="personaCheckbox"
-                      value="luxe"
-                    />
-                    luxe</label
-                  >
-                  <label class="persona-chip"
-                    ><input
-                      type="checkbox"
-                      class="personaCheckbox"
-                      value="frequent"
-                    />
-                    frequent</label
-                  >
-                  <label class="persona-chip"
-                    ><input
-                      type="checkbox"
-                      class="personaCheckbox"
-                      value="bulk"
-                    />
-                    bulk</label
-                  >
+            <div id="editorStep" class="editor-row hidden">
+              <div>
+                <div class="ad-preview-inner">
+                  <img id="previewImage" src="" alt="Ad preview" />
+                  <div class="ad-preview-title" id="previewTitle">CTA text</div>
+                  <div class="ad-preview-desc" id="previewDesc">
+                    CTA description
+                  </div>
+                  <div class="ad-preview-cta" id="previewButton">Apply now</div>
                 </div>
-              </form>
+              </div>
 
-              <button id="publishBtn" class="btn" disabled>Publish</button>
-              <div id="status" class="status"></div>
-              <div id="txLink"></div>
-              <div
-                id="adIdLabel"
-                style="margin-top: 6px; font-size: 12px; color: #9ca3af"
-              ></div>
+              <div>
+                <form id="settingsForm" onsubmit="return false;">
+                  <label
+                    >CTA Text
+                    <input
+                      id="ctaText"
+                      type="text"
+                      placeholder="Launch your dApp in minutes"
+                    />
+                  </label>
+                  <label
+                    >Description
+                    <textarea
+                      id="ctaDesc"
+                      placeholder="Short description of the offer"
+                    ></textarea>
+                  </label>
+                  <label
+                    >ClickTag (Landing URL)
+                    <input
+                      id="clickTag"
+                      type="text"
+                      placeholder="https://your-site.com"
+                    />
+                  </label>
+                  <label
+                    >Spend Limit (ETH)
+                    <input id="spendLimit" type="number" min="0" step="0.0001" />
+                  </label>
+                  <label
+                    >Image Size
+                    <select id="imageSize">
+                      <option value="vertical">vertical</option>
+                      <option value="horizontal">horizontal</option>
+                    </select>
+                  </label>
+
+                  <label>Select Persona(s)</label>
+                  <div class="persona-group">
+                    <label class="persona-chip"
+                      ><input
+                        type="checkbox"
+                        class="personaCheckbox"
+                        value="thrift"
+                      />
+                      thrift</label
+                    >
+                    <label class="persona-chip"
+                      ><input
+                        type="checkbox"
+                        class="personaCheckbox"
+                        value="luxe"
+                      />
+                      luxe</label
+                    >
+                    <label class="persona-chip"
+                      ><input
+                        type="checkbox"
+                        class="personaCheckbox"
+                        value="frequent"
+                      />
+                      frequent</label
+                    >
+                    <label class="persona-chip"
+                      ><input
+                        type="checkbox"
+                        class="personaCheckbox"
+                        value="bulk"
+                      />
+                      bulk</label
+                    >
+                  </div>
+                </form>
+
+                <button id="publishBtn" class="btn" disabled>Publish</button>
+                <div id="status" class="status"></div>
+                <div id="txLink"></div>
+                <div
+                  id="adIdLabel"
+                  style="margin-top: 6px; font-size: 12px; color: #9ca3af"
+                ></div>
+              </div>
             </div>
           </div>
         </section>
 
-        <!-- PAST ADS VIEW -->
         <section id="view-past-ads" class="view">
-          <h2>Past Ads</h2>
-          <div id="pastAdsList"></div>
+          <div class="section-view-wrapper">
+            <h2>Past Ads</h2>
+            <div id="pastAdsList"></div>
+          </div>
         </section>
 
-        <!-- DASHBOARD VIEW -->
         <section id="view-dashboard" class="view">
-          <h2>Analytics</h2>
+          <div class="section-view-wrapper">
+            <h2>Analytics</h2>
 
-          <div class="dash-grid">
-            <div class="dash-card">
-              <div class="dash-label">Sum · CTR</div>
-              <div class="dash-value" id="metricCTR">0.00</div>
-              <div class="dash-sub">Click-through rate across all ads</div>
-            </div>
-            <div class="dash-card">
-              <div class="dash-label">Sum · Clicks</div>
-              <div class="dash-value" id="metricClicks">0</div>
-              <div class="dash-sub">Total clicks tracked</div>
-            </div>
-            <div class="dash-card">
-              <div class="dash-label">Sum · Impressions</div>
-              <div class="dash-value" id="metricImpressions">0</div>
-              <div class="dash-sub">Total impressions served</div>
-            </div>
-            <div class="dash-card">
-              <div class="dash-label">Published Ads (on-chain)</div>
-              <div class="dash-value" id="metricAds">0</div>
-              <div class="dash-sub">Number of ads indexed by The Graph</div>
-            </div>
-          </div>
-
-          <div class="chart-grid">
-            <div class="chart-card">
-              <div class="chart-title">Variation of CTR (sample)</div>
-              <div class="chart-placeholder">
-                <div class="chart-line"></div>
+            <div class="dash-grid">
+              <div class="dash-card">
+                <div class="dash-label">Sum · CTR</div>
+                <div class="dash-value" id="metricCTR">0.00</div>
+                <div class="dash-sub">Click-through rate across all ads</div>
+              </div>
+              <div class="dash-card">
+                <div class="dash-label">Sum · Clicks</div>
+                <div class="dash-value" id="metricClicks">0</div>
+                <div class="dash-sub">Total clicks tracked</div>
+              </div>
+              <div class="dash-card">
+                <div class="dash-label">Sum · Impressions</div>
+                <div class="dash-value" id="metricImpressions">0</div>
+                <div class="dash-sub">Total impressions served</div>
+              </div>
+              <div class="dash-card">
+                <div class="dash-label">Published Ads (on-chain)</div>
+                <div class="dash-value" id="metricAds">0</div>
+                <div class="dash-sub">Number of ads indexed by The Graph</div>
               </div>
             </div>
-            <div class="chart-card">
-              <div class="chart-title">Clicks over time (sample)</div>
-              <div class="chart-placeholder">
-                <div class="chart-line" style="transform: scaleY(0.6)"></div>
+
+            <div class="chart-grid">
+              <div class="chart-card">
+                <div class="chart-title">Variation of CTR (sample)</div>
+                <div class="chart-placeholder">
+                  <div class="chart-line"></div>
+                </div>
               </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-title">Impressions over time (sample)</div>
-              <div class="chart-placeholder">
-                <div class="chart-line" style="transform: scaleY(0.9)"></div>
+              <div class="chart-card">
+                <div class="chart-title">Clicks over time (sample)</div>
+                <div class="chart-placeholder">
+                  <div class="chart-line" style="transform: scaleY(0.6)"></div>
+                </div>
+              </div>
+              <div class="chart-card">
+                <div class="chart-title">Impressions over time (sample)</div>
+                <div class="chart-placeholder">
+                  <div class="chart-line" style="transform: scaleY(0.9)"></div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- NOTIFICATIONS VIEW -->
         <section id="view-notifications" class="view">
-          <h2>Notifications</h2>
-          <p style="font-size: 12px; color: #9ca3af; margin-top: 4px">
-            These are sample entries. Wire this to Push / your backend feed when
-            ready.
-          </p>
-          <div id="notifList"></div>
+          <div class="section-view-wrapper">
+            <h2>Notifications</h2>
+            <p style="font-size: 12px; color: #9ca3af; margin-top: 4px">
+              These are sample entries. Wire this to Push / your backend feed when
+              ready.
+            </p>
+            <div id="notifList"></div>
+          </div>
         </section>
       </main>
     </div>
