@@ -12,6 +12,7 @@
 (function (global) {
   "use strict";
 
+  // Enforce rigid browser engine validation parameters
   if (typeof window === "undefined") {
     throw new Error("[dAdSpace SDK] Must run in browser.");
   }
@@ -26,7 +27,7 @@
   // -------------------------
   // Internal config + state
   // -------------------------
-  let _config = {
+  const _config = {
     contractAddress: null,
     abi: null,
     slotSelector: "#dad-ad-slot",
@@ -56,22 +57,35 @@
   }
 
   function clear(el) {
-    while (el.firstChild) el.removeChild(el.firstChild);
+    while (el.firstChild) {
+      el.removeChild(el.firstChild);
+    }
   }
 
   function el(tag, attrs = {}, children = []) {
     const element = document.createElement(tag);
-    Object.entries(attrs).forEach(([k, v]) => {
-      if (k === "style") Object.assign(element.style, v);
-      else if (k === "className") element.className = v;
-      else element.setAttribute(k, v);
+    
+    // Abstract property processing block entries
+    const attributeEntries = Object.entries(attrs);
+    attributeEntries.forEach(([key, val]) => {
+      if (key === "style") {
+        Object.assign(element.style, val);
+      } else if (key === "className") {
+        element.className = val;
+      } else {
+        element.setAttribute(key, val);
+      }
     });
-    if (!Array.isArray(children)) children = [children];
-    children.forEach((c) => {
-      if (typeof c === "string")
-        element.appendChild(document.createTextNode(c));
-      else if (c) element.appendChild(c);
+
+    const childNodes = Array.isArray(children) ? children : [children];
+    childNodes.forEach((child) => {
+      if (typeof child === "string") {
+        element.appendChild(document.createTextNode(child));
+      } else if (child) {
+        element.appendChild(child);
+      }
     });
+    
     return element;
   }
 
@@ -80,14 +94,11 @@
   // -------------------------
   function loadAdIdsFromLocalStorage() {
     try {
-      const raw = localStorage.getItem("dadspace_adIds");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === "object") {
-          _config.adIdsByPersona = {
-            ..._config.adIdsByPersona,
-            ...parsed,
-          };
+      const rawData = localStorage.getItem("dadspace_adIds");
+      if (rawData) {
+        const parsedData = JSON.parse(rawData);
+        if (parsedData && typeof parsedData === "object") {
+          _config.adIdsByPersona = Object.assign({}, _config.adIdsByPersona, parsedData);
         }
       }
     } catch (e) {
@@ -102,21 +113,23 @@
   // Wallet + Contract
   // -------------------------
   async function connectWalletIfNeeded() {
-    if (_wallet && _contract) return;
+    if (_wallet && _contract) {
+      return;
+    }
 
     if (!window.ethereum) {
       throw new Error("Install MetaMask or a compatible wallet.");
     }
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const accounts = await provider.send("eth_requestAccounts", []);
-    _wallet = accounts[0];
+    const userAccounts = await provider.send("eth_requestAccounts", []);
+    _wallet = userAccounts[0];
 
-    const signer = provider.getSigner();
+    const providerSigner = provider.getSigner();
     _contract = new ethers.Contract(
       _config.contractAddress,
       _config.abi,
-      signer
+      providerSigner
     );
   }
 
@@ -130,7 +143,7 @@
       );
       _persona = "thrift";
       _personaDetail = {
-        address,
+        address: address,
         persona: "thrift",
         features: {
           tx_30d: 0,
@@ -149,30 +162,29 @@
     }
 
     try {
-      const res = await fetch(_config.personaEndpoint, {
+      const serverResponse = await fetch(_config.personaEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address }),
+        body: JSON.stringify({ address: address }),
       });
 
-      if (!res.ok) {
-        throw new Error("Persona endpoint returned " + res.status);
+      if (!serverResponse.ok) {
+        throw new Error("Persona endpoint returned " + serverResponse.status);
       }
 
-      const data = await res.json();
-      // Expected shape: PersonaResponse { address, persona, features, scores }
-      const persona = data.persona;
+      const parsedJson = await serverResponse.json();
+      const resolvedTargetPersona = parsedJson.persona;
 
-      if (!persona || !PERSONAS.includes(persona)) {
+      if (!resolvedTargetPersona || !PERSONAS.includes(resolvedTargetPersona)) {
         console.warn(
           "[dAdSpace SDK] Invalid persona from backend. Using 'thrift'. Data:",
-          data
+          parsedJson
         );
         _persona = "thrift";
       } else {
-        _persona = persona;
+        _persona = resolvedTargetPersona;
       }
-      _personaDetail = data;
+      _personaDetail = parsedJson;
       return _persona;
     } catch (err) {
       console.warn(
@@ -189,11 +201,12 @@
   // Fetch ad data from smart contract
   // -------------------------
   function pickAdIdForPersona(persona) {
-    const list = _config.adIdsByPersona[persona];
-    if (!list || !Array.isArray(list) || list.length === 0) return null;
-    // pick last or random; here random to demo rotation
-    const idx = Math.floor(Math.random() * list.length);
-    return list[idx];
+    const contextList = _config.adIdsByPersona[persona];
+    if (!contextList || !Array.isArray(contextList) || contextList.length === 0) {
+      return null;
+    }
+    const targetIndex = Math.floor(Math.random() * contextList.length);
+    return contextList[targetIndex];
   }
 
   async function fetchAdForPersona(persona) {
@@ -201,32 +214,31 @@
       throw new Error("Contract not initialized.");
     }
 
-    const adId = pickAdIdForPersona(persona);
-    if (!adId) {
+    const assignedAdId = pickAdIdForPersona(persona);
+    if (!assignedAdId) {
       throw new Error(`No ad configured for persona '${persona}'.`);
     }
 
-    const ad = await _contract.transactions(adId);
+    const blockchainAdRecord = await _contract.transactions(assignedAdId);
 
-    if (!ad || !ad.adId || ad.adId.length === 0) {
-      throw new Error(`Ad '${adId}' does not exist on-chain.`);
+    if (!blockchainAdRecord || !blockchainAdRecord.adId || blockchainAdRecord.adId.length === 0) {
+      throw new Error(`Ad '${assignedAdId}' does not exist on-chain.`);
     }
 
-    if (!ad.status) {
-      throw new Error(`Ad '${adId}' is inactive.`);
+    if (!blockchainAdRecord.status) {
+      throw new Error(`Ad '${assignedAdId}' is inactive.`);
     }
 
-    // ad is a struct: (adId, spendLimit, imageUrl, imageSize, cta, desc, status, clickTag, publisherId)
     return {
-      adId: ad.adId,
-      spendLimit: ad.spendLimit,
-      imageUrl: ad.imageUrl,
-      imageSize: ad.imageSize,
-      cta: ad.cta,
-      desc: ad.desc,
-      status: ad.status,
-      clickTag: ad.clickTag,
-      publisherId: ad.publisherId,
+      adId: blockchainAdRecord.adId,
+      spendLimit: blockchainAdRecord.spendLimit,
+      imageUrl: blockchainAdRecord.imageUrl,
+      imageSize: blockchainAdRecord.imageSize,
+      cta: blockchainAdRecord.cta,
+      desc: blockchainAdRecord.desc,
+      status: blockchainAdRecord.status,
+      clickTag: blockchainAdRecord.clickTag,
+      publisherId: blockchainAdRecord.publisherId,
     };
   }
 
@@ -234,13 +246,15 @@
   // Analytics (/events)
   // -------------------------
   async function track(eventType, adData, metadata) {
-    if (!_config.analyticsEndpoint) return;
+    if (!_config.analyticsEndpoint) {
+      return;
+    }
 
     try {
-      const body = {
-        type: eventType, // "impression" | "click"
-        address: _wallet, // viewer wallet
-        persona: _persona || "thrift", // resolved persona
+      const transmissionPayload = {
+        type: eventType,
+        address: _wallet,
+        persona: _persona || "thrift",
         adId: adData.adId,
         publisherId: adData.publisherId,
         dappId: _config.dappId || "sample-dapp",
@@ -250,7 +264,7 @@
       await fetch(_config.analyticsEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify(transmissionPayload),
       });
     } catch (e) {
       console.warn("[dAdSpace SDK] Analytics failed", e);
@@ -261,16 +275,16 @@
   // Render Ad Slot
   // -------------------------
   async function renderSlot(selectorOverride) {
-    const selector = selectorOverride || _config.slotSelector;
-    const container = qs(selector);
+    const targetSelector = selectorOverride || _config.slotSelector;
+    const renderContainer = qs(targetSelector);
 
-    if (!container) {
-      throw new Error("[dAdSpace SDK] Invalid ad slot selector: " + selector);
+    if (!renderContainer) {
+      throw new Error("[dAdSpace SDK] Invalid ad slot selector: " + targetSelector);
     }
 
-    clear(container);
-    container.style.minHeight = "150px";
-    container.appendChild(
+    clear(renderContainer);
+    renderContainer.style.minHeight = "150px";
+    renderContainer.appendChild(
       el(
         "div",
         { style: { color: "#aaa", padding: "10px", fontSize: "12px" } },
@@ -283,15 +297,15 @@
       await connectWalletIfNeeded();
 
       // 2) Persona resolution via web2 backend (Dune-backed)
-      const persona = await resolvePersona(_wallet);
+      const resolvedIdentityPersona = await resolvePersona(_wallet);
 
       // 3) Fetch ad from contract based on persona
-      const ad = await fetchAdForPersona(persona);
+      const onChainAdMetadata = await fetchAdForPersona(resolvedIdentityPersona);
 
       // 4) Render UI card
-      clear(container);
+      clear(renderContainer);
 
-      const card = el(
+      const computedCardNode = el(
         "div",
         {
           style: {
@@ -330,15 +344,15 @@
                     fontSize: "11px",
                   },
                 },
-                `Persona: ${persona}`
+                `Persona: ${resolvedIdentityPersona}`
               ),
             ]
           ),
 
           // image
-          ad.imageUrl
+          onChainAdMetadata.imageUrl
             ? el("img", {
-                src: ad.imageUrl,
+                src: onChainAdMetadata.imageUrl,
                 style: {
                   width: "100%",
                   maxHeight: "260px",
@@ -360,7 +374,7 @@
                   lineHeight: 1.3,
                 },
               },
-              ad.desc || ""
+              onChainAdMetadata.desc || ""
             ),
             el(
               "button",
@@ -376,27 +390,26 @@
                   fontWeight: 600,
                 },
                 onclick: () => {
-                  // click tracking
-                  track("click", ad, { clickTag: ad.clickTag });
-                  if (ad.clickTag) {
-                    window.open(ad.clickTag, "_blank", "noopener,noreferrer");
+                  track("click", onChainAdMetadata, { clickTag: onChainAdMetadata.clickTag });
+                  if (onChainAdMetadata.clickTag) {
+                    window.open(onChainAdMetadata.clickTag, "_blank", "noopener,noreferrer");
                   }
                 },
               },
-              ad.cta || "Visit"
+              onChainAdMetadata.cta || "Visit"
             ),
           ]),
         ]
       );
 
-      container.appendChild(card);
+      renderContainer.appendChild(computedCardNode);
 
       // 5) Send impression automatically
-      track("impression", ad, { imageSize: ad.imageSize });
+      track("impression", onChainAdMetadata, { imageSize: onChainAdMetadata.imageSize });
     } catch (err) {
       console.error("[dAdSpace SDK] renderSlot error:", err);
-      clear(container);
-      container.appendChild(
+      clear(renderContainer);
+      renderContainer.appendChild(
         el(
           "div",
           { style: { color: "red", padding: "10px", fontSize: "12px" } },
@@ -410,18 +423,6 @@
   // PUBLIC API
   // -------------------------
   global.DadSpace = {
-    /**
-     * Initialize SDK:
-     *  DadSpace.init({
-     *    contractAddress,
-     *    abi,
-     *    slotSelector: "#dad-ad-slot",
-     *    personaEndpoint: "http://localhost:4000/persona",
-     *    analyticsEndpoint: "http://localhost:4000/events",
-     *    network: "sepolia",
-     *    dappId: "sample-dapp"
-     *  })
-     */
     init(config) {
       if (!config || typeof config !== "object") {
         throw new Error("[dAdSpace SDK] init() requires a config object");
@@ -435,18 +436,11 @@
         );
       }
 
-      // load persona → adIds mapping from localStorage
       loadAdIdsFromLocalStorage();
     },
 
-    /**
-     * Render an ad into the slot (optional selector override)
-     */
-    renderSlot,
+    renderSlot: renderSlot,
 
-    /**
-     * Inspect current SDK state (for debugging)
-     */
     getState() {
       return {
         wallet: _wallet,
