@@ -22,7 +22,7 @@
         min-height: 100vh;
       }
 
-      /* Sidebar */
+      /* Sidebar Navigation Interface */
       .sidebar {
         width: 240px;
         padding: 20px;
@@ -67,7 +67,7 @@
         color: white;
       }
 
-      /* Main Dynamic Workspaces */
+      /* Main Dynamic Analytical Workspaces */
       .main {
         flex: 1;
         padding: 24px 32px;
@@ -101,7 +101,7 @@
         display: block;
       }
 
-      /* Core Section Container Scaffolding */
+      /* Core Layout Scaffold Wrapper */
       .section-view-wrapper {
         display: flex;
         flex-direction: column;
@@ -109,7 +109,7 @@
         height: auto;
       }
 
-      /* New Ad layout */
+      /* Creative Creation Form Module */
       .header-row {
         display: flex;
         justify-content: space-between;
@@ -144,7 +144,7 @@
         align-items: flex-start;
       }
 
-      /* Preview Layout Controls */
+      /* Live Rendering Layout Parameters */
       .ad-preview-inner {
         width: 240px;
         border-radius: 18px;
@@ -180,7 +180,7 @@
         font-size: 12px;
       }
 
-      /* Form inputs and interactive interfaces */
+      /* Interactive Input Containers */
       form label {
         display: block;
         margin-bottom: 10px;
@@ -229,7 +229,7 @@
         color: #fca5a5;
       }
 
-      /* Past ads container grid */
+      /* Historical Record Presentation Mesh */
       #pastAdsList {
         margin-top: 16px;
         display: grid;
@@ -267,7 +267,7 @@
         margin-right: 4px;
       }
 
-      /* Analytics Dashboard Module Grid */
+      /* Core Statistical Information Blocks */
       .dash-grid {
         margin-top: 16px;
         display: grid;
@@ -338,7 +338,7 @@
         transform: scaleY(0.35);
       }
 
-      /* Notification Matrix Systems */
+      /* System Operational Alert Hub */
       #notifList {
         margin-top: 18px;
         display: flex;
@@ -617,7 +617,6 @@
         },
       ];
 
-      // The Graph subgraph URL
       const SUBGRAPH_URL =
         "https://api.studio.thegraph.com/query/1718236/d-adspace/version/latest";
 
@@ -629,7 +628,6 @@
 
       connectBtn.addEventListener("click", connectWallet);
 
-      // >>> NEW: react to MetaMask account / network changes
       if (window.ethereum) {
         window.ethereum.on("accountsChanged", async (accounts) => {
           if (!accounts || accounts.length === 0) {
@@ -659,11 +657,9 @@
         });
 
         window.ethereum.on("chainChanged", () => {
-          // ensures we re-init provider/contract on network change
           window.location.reload();
         });
       }
-      // <<< END NEW
 
       async function connectWallet() {
         if (!window.ethereum) {
@@ -684,7 +680,6 @@
         contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
       }
 
-      // ------------- Subgraph helper -------------
       async function fetchAdsFromSubgraph(publisherAddress) {
         if (!publisherAddress) return [];
 
@@ -722,7 +717,6 @@
         return json.data.ads;
       }
 
-      // ------------- Navigation -------------
       const navButtons = document.querySelectorAll(".nav-button");
       const views = {
         "new-ad": document.getElementById("view-new-ad"),
@@ -744,7 +738,6 @@
         });
       });
 
-      // ------------- New Ad form / preview -------------
       const startNewAdBtn = document.getElementById("startNewAdBtn");
       const uploadStep = document.getElementById("uploadStep");
       const fileInput = document.getElementById("fileInput");
@@ -823,7 +816,6 @@
         previewDesc.textContent = ctaDescInput.value || "CTA description";
       });
 
-      // ------------- Publish Ad -------------
       publishBtn.addEventListener("click", async () => {
         if (!contract || !currentAccount) {
           alert("Connect wallet first.");
@@ -913,7 +905,6 @@
         localStorage.setItem(key, JSON.stringify(list));
       }
 
-      // ------------- Past Ads rendering (from subgraph) -------------
       async function renderPastAds() {
         const container = document.getElementById("pastAdsList");
         container.innerHTML = "";
@@ -965,7 +956,6 @@
         }
       }
 
-      // ------------- Dashboard rendering -------------
       async function renderDashboard() {
         const localAds = JSON.parse(
           localStorage.getItem("dadspace_publishedAds") || "[]"
@@ -987,7 +977,6 @@
             ethers.utils.formatEther(totalSpendWei.toString())
           );
 
-          // Analytics backend not wired yet → keep 0 for now
           const totalImpressions = 0;
           const totalClicks = 0;
           const ctr = 0;
@@ -1014,7 +1003,6 @@
         }
       }
 
-      // ------------- Notifications (mock) -------------
       function renderNotifications() {
         const container = document.getElementById("notifList");
         container.innerHTML = "";
@@ -1049,7 +1037,6 @@
         });
       }
 
-      // initial state
       resetNewAdForm();
     </script>
   </body>
